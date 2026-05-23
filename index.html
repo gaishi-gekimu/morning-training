@@ -42,18 +42,11 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
 /* ── ドロワー ── */
 .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:180; opacity:0; pointer-events:none; transition:opacity .3s; }
 .drawer-overlay.visible { opacity:1; pointer-events:all; }
-.drawer { position:fixed; top:0; right:-340px; width:320px; height:100vh; background:#111; border-left:1px solid var(--border); z-index:190; transition:right .35s cubic-bezier(.4,0,.2,1); overflow-y:auto; display:flex; flex-direction:column; }
+.drawer { position:fixed; top:0; right:-340px; width:320px; height:100%; max-height:100vh; background:#111; border-left:1px solid var(--border); z-index:190; transition:right .35s cubic-bezier(.4,0,.2,1); overflow-y:scroll; overflow-x:hidden; display:flex; flex-direction:column; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
 .drawer.open { right:0; }
 .drawer-header { padding:24px 20px 16px; border-bottom:1px solid var(--border); }
 .drawer-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; color:var(--accent); }
 .drawer-sub { font-size:11px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
-
-/* Safari対応：ドロワー内スクロール */
-.drawer {
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  overscroll-behavior: contain;
-}
 
 .week-entry { border-bottom:1px solid var(--border); overflow:hidden; }
 .week-entry-header { padding:14px 20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:background .2s; }
@@ -306,9 +299,17 @@ function toggleDrawer() {
   const isOpen = document.getElementById('drawer').classList.toggle('open');
   document.getElementById('hamburgerBtn').classList.toggle('open');
   document.getElementById('drawerOverlay').classList.toggle('visible');
-  // ドロワーが開いているとき背面スクロールを止める
   document.body.style.overflow = isOpen ? 'hidden' : '';
 }
+
+// Safari対応：ドロワー外のタッチスクロールをブロック
+document.addEventListener('touchmove', function(e) {
+  const drawer = document.getElementById('drawer');
+  if (!drawer.classList.contains('open')) return;
+  if (!drawer.contains(e.target)) {
+    e.preventDefault();
+  }
+}, { passive: false });
 
 function buildDrawer() {
   const list = document.getElementById('weekList');
