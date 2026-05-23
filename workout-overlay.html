@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circuit Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --accent:#FF3C2F; --accent2:#FFD700;
+  --bg:#0a0a0a; --text:#fff;
+  --muted:rgba(255,255,255,0.45);
+  --card:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.12);
+}
+body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; overflow-x:hidden; }
+
+/* ── 背景 ── */
+.video-bg { position:fixed; inset:0; background: radial-gradient(ellipse at 30% 60%,rgba(255,60,47,.12) 0%,transparent 55%), radial-gradient(ellipse at 75% 30%,rgba(255,215,0,.07) 0%,transparent 50%), linear-gradient(160deg,#111 0%,#0a0a0a 100%); overflow:hidden; }
+.silhouette { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:320px; height:520px; background:linear-gradient(to top,rgba(255,60,47,.18),rgba(255,215,0,.04),transparent); clip-path:polygon(38% 0%,62% 0%,80% 15%,85% 40%,78% 60%,90% 75%,90% 100%,10% 100%,10% 75%,22% 60%,15% 40%,20% 15%); animation:breathe 3s ease-in-out infinite; filter:blur(1px); }
+.grid-overlay { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:48px 48px; }
+.noise { position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); opacity:.5; pointer-events:none; }
+.scanline { position:absolute; top:-100%; left:0; width:100%; height:60px; background:linear-gradient(transparent,rgba(255,60,47,.06),transparent); animation:scan 4s linear infinite; pointer-events:none; }
+@keyframes scan { to{top:200%} }
+@keyframes breathe { 0%,100%{transform:translateX(-50%) scaleY(1)} 50%{transform:translateX(-50%) scaleY(1.015) scaleX(1.01)} }
+
+/* ── ハンバーガーボタン ── */
+.hamburger-btn { position:fixed; top:20px; right:20px; z-index:200; width:44px; height:44px; background:rgba(0,0,0,.75); border:1px solid var(--border); border-radius:4px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:all .2s; }
+.hamburger-btn:hover { background:rgba(255,60,47,.2); border-color:var(--accent); }
+.hamburger-btn span { display:block; width:20px; height:2px; background:white; border-radius:2px; transition:all .3s; }
+.hamburger-btn.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.hamburger-btn.open span:nth-child(2) { opacity:0; }
+.hamburger-btn.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+/* ── サウンドボタン ── */
+.sound-btn { position:fixed; top:20px; right:72px; z-index:200; width:44px; height:44px; background:rgba(0,0,0,.75); border:1px solid var(--border); border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; line-height:1; transition:all .2s; }
+.sound-btn:hover { background:rgba(255,60,47,.2); border-color:var(--accent); }
+.sound-btn.muted { opacity:.4; border-color:rgba(255,255,255,.1); }
+
+
+/* ── ドロワー ── */
+.drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:180; opacity:0; pointer-events:none; transition:opacity .3s; }
+.drawer-overlay.visible { opacity:1; pointer-events:all; }
+.drawer { position:fixed; top:0; right:-340px; width:320px; height:100vh; background:#111; border-left:1px solid var(--border); z-index:190; transition:right .35s cubic-bezier(.4,0,.2,1); overflow-y:auto; display:flex; flex-direction:column; }
+.drawer.open { right:0; }
+.drawer-header { padding:24px 20px 16px; border-bottom:1px solid var(--border); }
+.drawer-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; color:var(--accent); }
+.drawer-sub { font-size:11px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+
+/* Safari対応：ドロワー内スクロール */
+.drawer {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.week-entry { border-bottom:1px solid var(--border); overflow:hidden; }
+.week-entry-header { padding:14px 20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:background .2s; }
+.week-entry-header:hover { background:var(--card); }
+.week-entry-header.current-week { background:rgba(255,60,47,.1); }
+.week-entry-label { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:3px; }
+.week-entry-label.cur { color:var(--accent); }
+.week-entry-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+.week-arrow { font-size:11px; color:var(--muted); transition:transform .3s; flex-shrink:0; }
+.week-entry-header.expanded .week-arrow { transform:rotate(180deg); }
+.week-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); background:rgba(0,0,0,.3); }
+.week-body.open { max-height:600px; }
+.week-body-inner { padding:12px 20px 16px; }
+.week-theme-tag { font-size:11px; color:var(--accent2); letter-spacing:1px; margin-bottom:10px; text-transform:uppercase; }
+.wex-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:12px; }
+.wex-row:last-of-type { border:none; }
+.wex-n { font-family:'Bebas Neue',sans-serif; font-size:11px; color:var(--muted); width:16px; flex-shrink:0; }
+.wex-name { flex:1; font-weight:700; }
+.wex-detail { font-size:11px; color:var(--muted); font-family:'Bebas Neue',sans-serif; letter-spacing:1px; }
+.drawer-start-btn { margin-top:12px; width:100%; padding:10px; font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:3px; background:var(--accent); color:white; border:none; border-radius:3px; cursor:pointer; transition:background .2s; }
+.drawer-start-btn:hover { background:#ff5547; }
+.drawer-past-label { margin-top:12px; text-align:center; font-size:11px; color:var(--muted); letter-spacing:1px; padding:8px; border:1px solid var(--border); border-radius:3px; }
+
+/* ── メインUI ── */
+.ui-wrap { position:relative; z-index:10; width:100%; max-width:480px; min-height:100vh; display:flex; flex-direction:column; padding:24px 20px; gap:14px; }
+.top-bar { display:flex; justify-content:space-between; align-items:center; }
+.week-badge { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:3px; color:var(--accent); border:1px solid var(--accent); padding:4px 12px; border-radius:2px; }
+.round-display { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2px; color:var(--muted); }
+.round-display span { color:var(--accent2); font-size:18px; }
+
+/* タイマーリング */
+.timer-section { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 0; }
+.timer-ring-wrap { position:relative; width:130px; height:130px; }
+.timer-ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { stroke:rgba(255,255,255,.08); }
+.ring-fg { stroke:var(--accent); stroke-linecap:round; transition:stroke-dashoffset 1s linear; filter:drop-shadow(0 0 6px rgba(255,60,47,.7)); }
+.ring-fg.rest { stroke:var(--accent2); filter:drop-shadow(0 0 6px rgba(255,215,0,.7)); }
+.ring-fg.endcount { stroke:#ff8800; filter:drop-shadow(0 0 8px rgba(255,140,0,.9)); }
+.timer-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.timer-num { font-family:'Bebas Neue',sans-serif; font-size:42px; line-height:1; letter-spacing:2px; transition:color .1s; }
+.timer-num.pulse { animation:numPulse .2s ease; }
+.timer-label { font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+@keyframes numPulse { 0%{transform:scale(1.35);color:#ff8800} 100%{transform:scale(1)} }
+
+/* 現在種目 */
+.current-exercise { background:var(--accent); border-radius:4px; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; animation:pulseBorder 2s ease-in-out infinite; position:relative; overflow:hidden; }
+.current-exercise::before { content:'NOW'; position:absolute; top:6px; right:10px; font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:2px; opacity:.7; }
+.current-exercise.rest-mode { background:rgba(255,215,0,.15); border:1px solid var(--accent2); }
+.current-exercise.rest-mode::before { color:var(--accent2); }
+@keyframes pulseBorder { 0%,100%{box-shadow:0 0 0 0 rgba(255,60,47,.4)} 50%{box-shadow:0 0 0 6px rgba(255,60,47,0)} }
+.ex-num { font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:3px; opacity:.7; margin-bottom:2px; }
+.ex-name { font-size:20px; font-weight:900; line-height:1.1; }
+.ex-sub { font-size:11px; opacity:.8; margin-top:4px; }
+.ex-count { font-family:'Bebas Neue',sans-serif; font-size:36px; line-height:1; text-align:right; }
+.ex-count-unit { font-size:11px; opacity:.7; text-align:right; }
+
+/* 休憩バナー */
+.rest-banner { display:none; background:rgba(255,215,0,.08); border:1px solid rgba(255,215,0,.3); border-radius:4px; padding:12px 16px; text-align:center; }
+.rest-banner.visible { display:block; }
+.rest-banner-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:4px; color:var(--accent2); }
+.rest-banner-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* サーキット進捗 */
+.circuit-progress { display:flex; gap:6px; align-items:center; }
+.circuit-label { font-family:'Bebas Neue',sans-serif; font-size:12px; letter-spacing:2px; color:var(--muted); flex-shrink:0; }
+.circuit-dots { display:flex; gap:6px; flex:1; }
+.circuit-dot { height:4px; flex:1; border-radius:2px; background:rgba(255,255,255,.12); transition:background .5s; }
+.circuit-dot.done { background:var(--accent); }
+.circuit-dot.active { background:var(--accent); opacity:.5; animation:dotPulse 1s ease-in-out infinite; }
+@keyframes dotPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+/* 種目リスト */
+.exercise-list { display:flex; flex-direction:column; gap:8px; }
+.ex-item { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:10px 14px; display:flex; align-items:center; gap:12px; transition:all .3s; }
+.ex-item.done { opacity:.35; border-color:transparent; }
+.ex-item.done .ex-item-num { background:rgba(255,255,255,.1); color:var(--muted); }
+.ex-item.active { border-color:var(--accent); background:rgba(255,60,47,.08); }
+.ex-item.active .ex-item-num { background:var(--accent); }
+.ex-item-num { font-family:'Bebas Neue',sans-serif; font-size:12px; background:rgba(255,255,255,.12); border-radius:2px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ex-item-name { flex:1; font-size:13px; font-weight:700; }
+.ex-item-detail { font-size:12px; color:var(--muted); font-family:'Bebas Neue',sans-serif; letter-spacing:1px; }
+.checkmark { font-size:14px; color:var(--accent); }
+
+/* コントロール */
+.controls { display:flex; gap:10px; margin-top:auto; padding-top:6px; }
+.btn { flex:1; padding:14px; font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:3px; border:none; border-radius:4px; cursor:pointer; transition:all .2s; }
+.btn-start { background:var(--accent); color:white; }
+.btn-start:hover { background:#ff5547; }
+.btn-reset { background:var(--card); color:var(--muted); border:1px solid var(--border); flex:0 0 auto; width:56px; font-size:18px; letter-spacing:0; }
+.btn-reset:hover { color:white; border-color:white; }
+
+.silent-notice {
+  text-align:center;
+  font-size:11px;
+  color:rgba(255,255,255,.3);
+  letter-spacing:.5px;
+  padding-bottom:8px;
+}
+
+/* 完了画面 */
+.complete-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:150; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; }
+.complete-overlay.visible { display:flex; }
+.complete-title { font-family:'Bebas Neue',sans-serif; font-size:64px; letter-spacing:6px; color:var(--accent2); line-height:1; animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1); }
+.complete-sub { font-size:14px; color:var(--muted); letter-spacing:2px; }
+.complete-stats { display:flex; gap:24px; margin-top:8px; }
+.stat { text-align:center; }
+.stat-num { font-family:'Bebas Neue',sans-serif; font-size:36px; color:var(--accent); }
+.stat-label { font-size:11px; color:var(--muted); letter-spacing:1px; }
+.btn-again { margin-top:16px; padding:14px 40px; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:4px; background:var(--accent); color:white; border:none; border-radius:4px; cursor:pointer; }
+@keyframes scaleIn { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+</style>
+</head>
+<body>
+
+<div class="video-bg">
+  <div class="silhouette"></div>
+  <div class="grid-overlay"></div>
+  <div class="noise"></div>
+  <div class="scanline"></div>
+</div>
+
+<!-- ハンバーガー -->
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDrawer()">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- サウンドON/OFF -->
+<button class="sound-btn" id="soundBtn" onclick="toggleSound()">🔊</button>
+
+
+<!-- オーバーレイ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+
+<!-- ドロワー -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">TRAINING LOG</div>
+    <div class="drawer-sub">週ごとのメニュー履歴</div>
+  </div>
+  <div id="weekList"></div>
+</div>
+
+<!-- メインUI -->
+<div class="ui-wrap">
+  <div class="top-bar">
+    <div>
+      <div class="week-badge" id="weekBadge">WEEK 1</div>
+      <div class="round-display" style="margin-top:6px;">ROUND <span id="roundNum">1</span> / 2</div>
+    </div>
+  </div>
+
+  <div class="timer-section">
+    <div class="timer-ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle class="ring-bg" cx="65" cy="65" r="56" fill="none" stroke-width="6"/>
+        <circle id="timerRing" class="ring-fg" cx="65" cy="65" r="56" fill="none" stroke-width="6"
+          stroke-dasharray="351.86" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-num" id="timerNum">—</div>
+        <div class="timer-label" id="timerLabel">READY</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="current-exercise" id="currentEx">
+    <div class="ex-left">
+      <div class="ex-num" id="currentExNum">EXERCISE 01 / 05</div>
+      <div class="ex-name" id="currentExName">スロースクワット</div>
+      <div class="ex-sub" id="currentExSub">4秒で下ろす・お尻を意識</div>
+    </div>
+    <div>
+      <div class="ex-count" id="currentExCount">10</div>
+      <div class="ex-count-unit" id="currentExUnit">回</div>
+    </div>
+  </div>
+
+  <div class="rest-banner" id="restBanner">
+    <div class="rest-banner-title">REST — 30 SEC</div>
+    <div class="rest-banner-sub">次のラウンドに備えて息を整えよう</div>
+  </div>
+
+  <div class="circuit-progress">
+    <div class="circuit-label">CIRCUIT</div>
+    <div class="circuit-dots" id="circuitDots"></div>
+  </div>
+
+  <div class="exercise-list" id="exerciseList"></div>
+
+  <div class="controls">
+    <button class="btn btn-start" id="startBtn" onclick="toggleStart()">START</button>
+    <button class="btn btn-reset" onclick="resetAll()">↺</button>
+  </div>
+  <div class="silent-notice">🔔 音が鳴らない場合はサイレントモードを解除してください</div>
+</div>
+
+<!-- 完了画面 -->
+<div class="complete-overlay" id="completeOverlay">
+  <div class="complete-title">DONE!</div>
+  <div class="complete-sub">TODAY'S CIRCUIT COMPLETE</div>
+  <div class="complete-stats">
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">ROUNDS</div></div>
+    <div class="stat"><div class="stat-num" id="exDoneCount">5</div><div class="stat-label">EXERCISES</div></div>
+    <div class="stat"><div class="stat-num" id="totalTime">—</div><div class="stat-label">MINUTES</div></div>
+  </div>
+  <button class="btn-again" onclick="resetAll()">もう1周やる</button>
+</div>
+
+<script>
+// ════════════════════════════════
+// 週メニューデータ（week2以降はここに追加）
+// ════════════════════════════════
+const ALL_WEEKS = [
+  {
+    week: 1,
+    theme: '毎日同じメニューを7日間やり切る',
+    exercises: [
+      { name:'スロースクワット',     sub:'4秒で下ろす・お尻を意識', count:10, unit:'回', dur:40, metro:4   },
+      { name:'ヒップリフト',         sub:'お尻をしっかり絞る',       count:15, unit:'回', dur:45, metro:3   },
+      { name:'膝なし腕立て伏せ',     sub:'体幹を締めて一直線',       count:10, unit:'回', dur:30, metro:3   },
+      { name:'マウンテンクライマー', sub:'できる限り速く',           count:30, unit:'秒', dur:30, metro:null },
+      { name:'プランク',             sub:'腰が落ちたら終わり',       count:45, unit:'秒', dur:45, metro:null },
+    ]
+  },
+  {
+    week: 2,
+    theme: '全身の筋肉を総動員する週',
+    exercises: [
+      // metro: 秒/回（メトロノーム間隔）。nullなら時間制でメトロなし
+      { name:'飛ばないバービー',         sub:'手をついてプランク→立つ・素早く',   count:10, unit:'回', dur:30, metro:3   },
+      { name:'パイクプッシュアップ',     sub:'お尻を高く上げた腕立て・肩に効く', count:10, unit:'回', dur:30, metro:3   },
+      { name:'リバースランジ',           sub:'後ろに踏み出す・膝を床ギリギリに', count:20, unit:'回', dur:40, metro:2   },
+      { name:'バードドッグ',             sub:'対角線に手足を伸ばす・体幹を締める',count:20, unit:'回', dur:50, metro:2.5 },
+      { name:'マウンテンクライマー',     sub:'できる限り速く',                   count:40, unit:'秒', dur:40, metro:null },
+    ]
+  },
+];
+
+const REST_DUR = 30;
+const TOTAL_ROUNDS = 2;
+
+let currentWeekIdx = ALL_WEEKS.length - 1;
+let EXERCISES = ALL_WEEKS[currentWeekIdx].exercises;
+
+let running = false, timer = null, countdownTimer = null;
+let timeLeft = 0, curRound = 1, curEx = 0, isRest = false, startTimestamp = null;
+
+// ── ハンバーガードロワー ──
+function toggleDrawer() {
+  const isOpen = document.getElementById('drawer').classList.toggle('open');
+  document.getElementById('hamburgerBtn').classList.toggle('open');
+  document.getElementById('drawerOverlay').classList.toggle('visible');
+  // ドロワーが開いているとき背面スクロールを止める
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function buildDrawer() {
+  const list = document.getElementById('weekList');
+  list.innerHTML = '';
+  [...ALL_WEEKS].reverse().forEach((w, ri) => {
+    const origIdx = ALL_WEEKS.length - 1 - ri;
+    const isCur = origIdx === ALL_WEEKS.length - 1;
+    const div = document.createElement('div');
+    div.className = 'week-entry';
+    const rows = w.exercises.map((ex,i) =>
+      `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.count}${ex.unit}</div></div>`
+    ).join('');
+    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>`;
+    div.innerHTML = `
+      <div class="week-entry-header ${isCur?'current-week':''}" onclick="toggleEntry(this)">
+        <div>
+          <div class="week-entry-label ${isCur?'cur':''}">WEEK ${w.week}${isCur?' ● CURRENT':''}</div>
+          <div class="week-entry-meta">${w.theme}</div>
+        </div>
+        <div class="week-arrow">▼</div>
+      </div>
+      <div class="week-body ${isCur?'open':''}">
+        <div class="week-body-inner">
+          <div class="week-theme-tag">THEME : ${w.theme}</div>
+          ${rows}
+          ${actionHtml}
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function toggleEntry(header) {
+  header.classList.toggle('expanded');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+function loadWeekAndClose(idx) {
+  currentWeekIdx = idx;
+  EXERCISES = ALL_WEEKS[idx].exercises;
+  document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[idx].week}`;
+  resetAll();
+  toggleDrawer();
+}
+
+// ── リスト構築 ──
+function buildList() {
+  const list = document.getElementById('exerciseList');
+  list.innerHTML = '';
+  const dots = document.getElementById('circuitDots');
+  dots.innerHTML = '';
+  EXERCISES.forEach((ex,i) => {
+    const el = document.createElement('div');
+    el.className = 'ex-item' + (i===0?' active':'');
+    el.id = `exItem${i}`;
+    el.innerHTML = `<div class="ex-item-num">${i+1}</div><div class="ex-item-name">${ex.name}</div><div class="ex-item-detail">${ex.count}${ex.unit}</div><div class="checkmark" id="check${i}"></div>`;
+    list.appendChild(el);
+    const dot = document.createElement('div');
+    dot.className = 'circuit-dot' + (i===0?' active':'');
+    dot.id = `dot${i}`;
+    dots.appendChild(dot);
+  });
+  const ex0 = EXERCISES[0];
+  document.getElementById('currentExNum').textContent   = `EXERCISE 01 / 0${EXERCISES.length}`;
+  document.getElementById('currentExName').textContent  = ex0.name;
+  document.getElementById('currentExSub').textContent   = ex0.sub;
+  document.getElementById('currentExCount').textContent = ex0.count;
+  document.getElementById('currentExUnit').textContent  = ex0.unit;
+}
+
+function updateCurrentEx() {
+  const ex = EXERCISES[curEx];
+  document.getElementById('currentExNum').textContent   = `EXERCISE ${String(curEx+1).padStart(2,'0')} / 0${EXERCISES.length}`;
+  document.getElementById('currentExName').textContent  = ex.name;
+  document.getElementById('currentExSub').textContent   = ex.sub;
+  document.getElementById('currentExCount').textContent = ex.count;
+  document.getElementById('currentExUnit').textContent  = ex.unit;
+  EXERCISES.forEach((_,i) => {
+    const item = document.getElementById(`exItem${i}`);
+    const dot  = document.getElementById(`dot${i}`);
+    item.classList.remove('active','done');
+    dot.classList.remove('active','done');
+    if (i < curEx) { item.classList.add('done'); dot.classList.add('done'); document.getElementById(`check${i}`).textContent='✓'; }
+    else if (i === curEx) { item.classList.add('active'); dot.classList.add('active'); }
+  });
+}
+
+function setRing(ratio, mode) {
+  const ring = document.getElementById('timerRing');
+  ring.style.strokeDashoffset = 351.86 * (1 - ratio);
+  ring.classList.remove('rest','endcount');
+  if (mode==='rest') ring.classList.add('rest');
+  if (mode==='endcount') ring.classList.add('endcount');
+}
+
+// ── サウンド ──
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const masterGain = audioCtx.createGain();
+masterGain.gain.value = 1.0;
+masterGain.connect(audioCtx.destination);
+
+let soundOn = true;
+
+function toggleSound() {
+  soundOn = !soundOn;
+  masterGain.gain.value = soundOn ? 1.0 : 0;
+  const btn = document.getElementById('soundBtn');
+  btn.textContent = soundOn ? '🔊' : '🔇';
+  btn.classList.toggle('muted', !soundOn);
+}
+
+// ── スリープ防止（Wake Lock API）──
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+    } catch(e) { /* 非対応ブラウザは無視 */ }
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    try { await wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+
+// タブ復帰時に再取得
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && running) requestWakeLock();
+});
+
+function beep({ freq=880, dur=0.12, type='sine', gain=0.5, delay=0 }) {
+  if (!soundOn) return;
+  const osc = audioCtx.createOscillator();
+  const gn  = audioCtx.createGain();
+  osc.connect(gn); gn.connect(masterGain);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+  gn.gain.setValueAtTime(0, audioCtx.currentTime + delay);
+  gn.gain.linearRampToValueAtTime(gain, audioCtx.currentTime + delay + 0.01);
+  gn.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + dur);
+  osc.start(audioCtx.currentTime + delay);
+  osc.stop(audioCtx.currentTime + delay + dur + 0.05);
+}
+
+function playStart() {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  [523,659,784,1047].forEach((f,i) => beep({ freq:f, dur:0.22, gain:0.85, delay:i*0.1 }));
+}
+
+// スタート前カウントダウン音
+function playStartBeep(n) {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  if (n > 0) beep({ freq:660, dur:0.12, gain:0.9 });
+  else { beep({ freq:880, dur:0.6, gain:1.0 }); beep({ freq:1100, dur:0.5, gain:0.5, delay:0.05 }); }
+}
+
+// 種目終了3秒前カウントダウン音（ぷ・ぷ・ぷ・ぷー）
+function playEndBeep(n) {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  if (n > 0) {
+    beep({ freq:750, dur:0.11, gain:0.9 });
+  } else {
+    beep({ freq:950, dur:0.16, gain:1.0 });
+    beep({ freq:620, dur:0.26, gain:0.8, delay:0.14 });
+  }
+}
+
+function playFinale() {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  [523,659,784,880,1047].forEach((f,i) => beep({ freq:f, dur:0.28, gain:0.85, delay:i*0.12 }));
+}
+
+// メトロノーム音（ピッ）
+function playMetro(isFirst) {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  // 最初の1回だけ少し高め（動き出しのアクセント）
+  beep({ freq: isFirst ? 1000 : 800, dur:0.07, gain:0.75 });
+}
+
+// ── メトロノーム（実WAVサンプル）──
+const WHISTLE_B64 = "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";
+
+let whistleBuffer = null;
+async function loadWhistle() {
+  try {
+    const bin = atob(WHISTLE_B64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    whistleBuffer = await audioCtx.decodeAudioData(bytes.buffer);
+  } catch(e) { console.warn('whistle load failed', e); }
+}
+loadWhistle();
+
+function playWhistleAt(when) {
+  if (!whistleBuffer || !soundOn) return;
+  const src = audioCtx.createBufferSource();
+  src.buffer = whistleBuffer;
+  const gn = audioCtx.createGain();
+  gn.gain.value = 1.5;
+  src.connect(gn); gn.connect(masterGain);
+  src.start(when);
+}
+
+let metroIntervalSec = 0;
+let metroNextTime = 0;
+let metroRAF = null;
+let metroRepCount = 0; // 残り回数カウント
+
+function scheduleMetro() {
+  while (metroNextTime < audioCtx.currentTime + 0.15) {
+    playWhistleAt(metroNextTime);
+    const schedTime = metroNextTime;
+    const capturedCurEx = curEx; // スケジュール時点のcurExをキャプチャ
+    setTimeout(() => {
+      if (!running) return;
+      if (curEx !== capturedCurEx) return; // 種目が変わっていたら無視
+      metroRepCount--;
+      const numEl = document.getElementById('timerNum');
+      const ex = EXERCISES[curEx];
+      if (!ex) return;
+      if (metroRepCount > 0) {
+        numEl.textContent = metroRepCount;
+        setRing(metroRepCount / ex.count, metroRepCount <= 3 ? 'endcount' : 'exercise');
+        if (metroRepCount <= 3) {
+          playEndBeep(metroRepCount);
+          numEl.classList.remove('pulse');
+          void numEl.offsetWidth;
+          numEl.classList.add('pulse');
+        }
+      } else {
+        // 回数完了 → 次の種目へ
+        stopMetro();
+        playEndBeep(0);
+        curEx++;
+        if (curEx >= EXERCISES.length) {
+          if (curRound < TOTAL_ROUNDS) {
+            curRound++;
+            document.getElementById('roundNum').textContent = curRound;
+            EXERCISES.forEach((_,i) => {
+              document.getElementById(`exItem${i}`).classList.add('done');
+              document.getElementById(`dot${i}`).classList.add('done');
+              document.getElementById(`check${i}`).textContent = '✓';
+            });
+            isRest = true; showRestUI(); startRest();
+          } else { showComplete(); }
+        } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
+      }
+    }, Math.max(0, (schedTime - audioCtx.currentTime) * 1000));
+    metroNextTime += metroIntervalSec;
+  }
+  metroRAF = requestAnimationFrame(scheduleMetro);
+}
+
+function startMetro(intervalSec, repCount) {
+  stopMetro();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  metroIntervalSec = intervalSec;
+  // 少し間を置いてから1発目（GO後に動き始めるタイミングに合わせる）
+  metroNextTime = audioCtx.currentTime + 0.3;
+  metroRepCount = repCount;
+  scheduleMetro();
+}
+
+function stopMetro() {
+  if (metroRAF) { cancelAnimationFrame(metroRAF); metroRAF = null; }
+}
+
+// ── スタート前カウントダウン（3・2・1・GO）──
+function runStartCountdown(cb) {
+  if (audioCtx.state==='suspended') audioCtx.resume();
+  let n = 3;
+  document.getElementById('timerNum').textContent  = n;
+  document.getElementById('timerLabel').textContent = 'GET READY';
+  setRing(1,'exercise');
+  playStartBeep(n);
+  countdownTimer = setInterval(() => {
+    n--;
+    if (n > 0) { document.getElementById('timerNum').textContent = n; playStartBeep(n); }
+    else { document.getElementById('timerNum').textContent = 'GO'; playStartBeep(0); clearInterval(countdownTimer); setTimeout(cb, 600); }
+  }, 1000);
+}
+
+// ── メインtick ──
+function tick() {
+  timeLeft--;
+  const total = isRest ? REST_DUR : EXERCISES[curEx].dur;
+  const ex = isRest ? null : EXERCISES[curEx];
+  const numEl = document.getElementById('timerNum');
+
+  // 回数制種目はscheduleMetroが表示を管理するのでtickは秒表示を触らない
+  if (!isRest && ex && ex.metro) {
+    // 終了3秒前の処理だけ担当（timeLeft = dur - 経過秒）
+    if (timeLeft <= 3 && timeLeft >= 0) {
+      // endcountはscheduleMetroで処理済みなのでここでは何もしない
+    }
+  } else {
+    numEl.textContent = timeLeft;
+    if (!isRest && timeLeft <= 3 && timeLeft >= 0) {
+      setRing(timeLeft / total, 'endcount');
+      playEndBeep(timeLeft);
+      numEl.classList.remove('pulse');
+      void numEl.offsetWidth;
+      numEl.classList.add('pulse');
+    } else if (isRest && timeLeft <= 3 && timeLeft >= 0) {
+      setRing(timeLeft / total, 'rest');
+      playEndBeep(timeLeft);
+      numEl.classList.remove('pulse');
+      void numEl.offsetWidth;
+      numEl.classList.add('pulse');
+    } else {
+      setRing(timeLeft / total, isRest ? 'rest' : 'exercise');
+    }
+  }
+
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    if (isRest) {
+      isRest = false; curEx = 0;
+      updateCurrentEx(); showExUI();
+      startEx();
+    } else {
+      curEx++;
+      if (curEx >= EXERCISES.length) {
+        if (curRound < TOTAL_ROUNDS) {
+          curRound++;
+          document.getElementById('roundNum').textContent = curRound;
+          EXERCISES.forEach((_,i) => {
+            document.getElementById(`exItem${i}`).classList.add('done');
+            document.getElementById(`dot${i}`).classList.add('done');
+            document.getElementById(`check${i}`).textContent = '✓';
+          });
+          isRest = true; showRestUI(); startRest();
+        } else { showComplete(); }
+      } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
+    }
+  }
+}
+
+// 種目間3秒インターバル
+function showNextInterval(cb) {
+  const numEl = document.getElementById('timerNum');
+  const labelEl = document.getElementById('timerLabel');
+  const nextEx = EXERCISES[curEx];
+  let count = 3;
+  numEl.textContent = count;
+  labelEl.textContent = 'NEXT';
+  setRing(1, 'rest');
+  document.getElementById('currentExName').textContent  = nextEx.name;
+  document.getElementById('currentExSub').textContent   = '準備してください';
+  document.getElementById('currentExCount').textContent = nextEx.count;
+  document.getElementById('currentExUnit').textContent  = nextEx.unit;
+  document.getElementById('currentExNum').textContent   = `NEXT: EXERCISE ${String(curEx+1).padStart(2,'0')} / 0${EXERCISES.length}`;
+  playStartBeep(count);
+
+  const intervalTimer = setInterval(() => {
+    count--;
+    if (count > 0) {
+      numEl.textContent = count;
+      playStartBeep(count);
+    } else {
+      numEl.textContent = 'GO';
+      playStartBeep(0);
+      clearInterval(intervalTimer);
+      // GOの後に種目開始→metroはstartEx内で起動されるので1回目はGO後から
+      setTimeout(cb, 800);
+    }
+  }, 1000);
+}
+
+function startEx() {
+  const ex = EXERCISES[curEx];
+  timeLeft = ex.dur;
+  if (ex.metro) {
+    // 回数制：tickは使わずmetroだけで完結
+    document.getElementById('timerNum').textContent   = ex.count;
+    document.getElementById('timerLabel').textContent = 'REPS';
+    setRing(1, 'exercise');
+    startMetro(ex.metro, ex.count);
+    // tickは起動しない
+  } else {
+    document.getElementById('timerNum').textContent   = timeLeft;
+    document.getElementById('timerLabel').textContent = 'SEC';
+    setRing(1, 'exercise');
+    stopMetro();
+    timer = setInterval(tick, 1000);
+  }
+}
+
+function startRest() {
+  stopMetro();
+  timeLeft = REST_DUR;
+  document.getElementById('timerNum').textContent  = timeLeft;
+  document.getElementById('timerLabel').textContent = 'REST';
+  setRing(1, 'rest');
+  timer = setInterval(tick, 1000);
+}
+
+function showExUI() {
+  document.getElementById('currentEx').classList.remove('rest-mode');
+  document.getElementById('restBanner').classList.remove('visible');
+}
+
+function showRestUI() {
+  document.getElementById('currentEx').classList.add('rest-mode');
+  document.getElementById('currentExName').textContent  = '休憩中';
+  document.getElementById('currentExSub').textContent   = '次のラウンドに備えて息を整えよう';
+  document.getElementById('currentExCount').textContent = REST_DUR;
+  document.getElementById('currentExUnit').textContent  = '秒';
+  document.getElementById('currentExNum').textContent   = 'REST TIME';
+  document.getElementById('restBanner').classList.add('visible');
+}
+
+function showComplete() {
+  running = false;
+  stopMetro();
+  releaseWakeLock();
+  const mins = (Math.round((Date.now()-startTimestamp)/1000)/60).toFixed(1);
+  document.getElementById('totalTime').textContent   = mins;
+  document.getElementById('exDoneCount').textContent = EXERCISES.length;
+  document.getElementById('completeOverlay').classList.add('visible');
+  playFinale();
+}
+
+// ── コントロール ──
+function toggleStart() {
+  const btn = document.getElementById('startBtn');
+  if (!running) {
+    running = true;
+    btn.textContent = 'PAUSE';
+    showExUI();
+    requestWakeLock();
+    if (!startTimestamp) {
+      // 初回：スタート音＋カウントダウン
+      playStart();
+      runStartCountdown(() => { startTimestamp = Date.now(); startEx(); });
+    } else {
+      // ポーズ後再開：残り秒数からそのまま再開
+      timer = setInterval(tick, 1000);
+    }
+  } else {
+    running = false;
+    clearInterval(timer); clearInterval(countdownTimer);
+    stopMetro();
+    releaseWakeLock();
+    btn.textContent = 'RESUME';
+  }
+}
+
+function resetAll() {
+  clearInterval(timer); clearInterval(countdownTimer);
+  stopMetro();
+  releaseWakeLock();
+  running = false; curRound = 1; curEx = 0; isRest = false; startTimestamp = null;
+  document.getElementById('roundNum').textContent   = '1';
+  document.getElementById('timerNum').textContent   = '—';
+  document.getElementById('timerLabel').textContent = 'READY';
+  document.getElementById('startBtn').textContent   = 'START';
+  document.getElementById('restBanner').classList.remove('visible');
+  document.getElementById('currentEx').classList.remove('rest-mode');
+  document.getElementById('completeOverlay').classList.remove('visible');
+  setRing(1, 'exercise');
+  buildList();
+}
+
+// ── 初期化 ──
+// 最新週をバッジに反映
+document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[currentWeekIdx].week}`;
+buildList();
+buildDrawer();
+</script>
+</body>
+</html>
