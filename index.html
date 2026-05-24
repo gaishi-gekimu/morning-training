@@ -476,8 +476,9 @@ function playEndBeep(n) {
   if (n > 0) {
     beep({ freq:750, dur:0.11, gain:0.9 });
   } else {
-    beep({ freq:950, dur:0.16, gain:1.0 });
-    beep({ freq:620, dur:0.26, gain:0.8, delay:0.14 });
+    // 長めのピー（種目終了）
+    beep({ freq:950, dur:0.55, gain:1.0 });
+    beep({ freq:700, dur:0.45, gain:0.6, delay:0.08 });
   }
 }
 
@@ -652,12 +653,12 @@ function tick() {
   }
 }
 
-// 種目間3秒インターバル
+// 種目間5秒インターバル
 function showNextInterval(cb) {
   const numEl = document.getElementById('timerNum');
   const labelEl = document.getElementById('timerLabel');
   const nextEx = EXERCISES[curEx];
-  let count = 3;
+  let count = 5;
   numEl.textContent = count;
   labelEl.textContent = 'NEXT';
   setRing(1, 'rest');
@@ -677,7 +678,6 @@ function showNextInterval(cb) {
       numEl.textContent = 'GO';
       playStartBeep(0);
       clearInterval(intervalTimer);
-      // GOの後に種目開始→metroはstartEx内で起動されるので1回目はGO後から
       setTimeout(cb, 800);
     }
   }, 1000);
