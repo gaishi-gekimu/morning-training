@@ -545,22 +545,26 @@ function scheduleMetro() {
           numEl.classList.add('pulse');
         }
       } else {
-        // 回数完了 → 次の種目へ
+        // 回数完了 → 0を表示してから1回分待って次へ
         stopMetro();
         playEndBeep(0);
-        curEx++;
-        if (curEx >= EXERCISES.length) {
-          if (curRound < TOTAL_ROUNDS) {
-            curRound++;
-            document.getElementById('roundNum').textContent = curRound;
-            EXERCISES.forEach((_,i) => {
-              document.getElementById(`exItem${i}`).classList.add('done');
-              document.getElementById(`dot${i}`).classList.add('done');
-              document.getElementById(`check${i}`).textContent = '✓';
-            });
-            isRest = true; showRestUI(); startRest();
-          } else { showComplete(); }
-        } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
+        numEl.textContent = 0;
+        setRing(0, 'endcount');
+        setTimeout(() => {
+          curEx++;
+          if (curEx >= EXERCISES.length) {
+            if (curRound < TOTAL_ROUNDS) {
+              curRound++;
+              document.getElementById('roundNum').textContent = curRound;
+              EXERCISES.forEach((_,i) => {
+                document.getElementById(`exItem${i}`).classList.add('done');
+                document.getElementById(`dot${i}`).classList.add('done');
+                document.getElementById(`check${i}`).textContent = '✓';
+              });
+              isRest = true; showRestUI(); startRest();
+            } else { showComplete(); }
+          } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
+        }, metroIntervalSec * 1000);
       }
     }, Math.max(0, (schedTime - audioCtx.currentTime) * 1000));
     metroNextTime += metroIntervalSec;
