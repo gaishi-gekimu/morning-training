@@ -283,9 +283,17 @@ const ALL_WEEKS = [
       { name:'マウンテンクライマー',     sub:'できる限り速く',                   count:40, unit:'秒', dur:40, metro:null },
     ]
   },
+  {
+    week: 3,
+    theme: 'ハイロックス風・全身サーキット',
+    exercises: [
+      { name:'バーピーブロード', sub:'スクワット→胸を床に→立ち上がる', count:10, unit:'回', dur:50, metro:5   },
+      { name:'ウォーターボトルランジ',           sub:'2Lボトル両手持ち・膝を床ギリギリに',  count:20, unit:'回', dur:50, metro:2.5 },
+      { name:'ウォールボトル',                   sub:'2Lボトルを胸前→スクワット→頭上へ押す',count:10, unit:'回', dur:30, metro:3   },
+      { name:'マウンテンクライマー',             sub:'できる限り速く',                       count:45, unit:'秒', dur:45, metro:null },
+    ]
+  },
 ];
-
-const REST_DUR = 30;
 const TOTAL_ROUNDS = 2;
 
 let currentWeekIdx = ALL_WEEKS.length - 1;
@@ -470,6 +478,14 @@ function playStartBeep(n) {
   else { beep({ freq:880, dur:0.6, gain:1.0 }); beep({ freq:1100, dur:0.5, gain:0.5, delay:0.05 }); }
 }
 
+// バードドッグ左右交代音（高め2連打）
+function playSwitchBeep() {
+  if (!soundOn) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  beep({ freq:1200, dur:0.09, gain:1.0 });
+  beep({ freq:1200, dur:0.09, gain:1.0, delay:0.12 });
+}
+
 // 種目終了3秒前カウントダウン音（ぷ・ぷ・ぷ・ぷー）
 function playEndBeep(n) {
   if (audioCtx.state==='suspended') audioCtx.resume();
@@ -527,10 +543,10 @@ function scheduleMetro() {
   while (metroNextTime < audioCtx.currentTime + 0.15) {
     playWhistleAt(metroNextTime);
     const schedTime = metroNextTime;
-    const capturedCurEx = curEx; // スケジュール時点のcurExをキャプチャ
+    const capturedCurEx = curEx;
     setTimeout(() => {
       if (!running) return;
-      if (curEx !== capturedCurEx) return; // 種目が変わっていたら無視
+      if (curEx !== capturedCurEx) return;
       metroRepCount--;
       const numEl = document.getElementById('timerNum');
       const ex = EXERCISES[curEx];
@@ -538,7 +554,15 @@ function scheduleMetro() {
       if (metroRepCount > 0) {
         numEl.textContent = metroRepCount;
         setRing(metroRepCount / ex.count, metroRepCount <= 3 ? 'endcount' : 'exercise');
-        if (metroRepCount <= 3) {
+
+        // バードドッグの折り返し（残り10回＝半分）に交代音
+        const isHalf = ex.count > 0 && metroRepCount === ex.count / 2;
+        if (ex.name && ex.name.includes('バードドッグ') && isHalf) {
+          playSwitchBeep();
+          numEl.classList.remove('pulse');
+          void numEl.offsetWidth;
+          numEl.classList.add('pulse');
+        } else if (metroRepCount <= 3) {
           playEndBeep(metroRepCount);
           numEl.classList.remove('pulse');
           void numEl.offsetWidth;
