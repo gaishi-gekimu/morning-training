@@ -293,6 +293,17 @@ const ALL_WEEKS = [
       { name:'マウンテンクライマー',             sub:'できる限り速く',                       count:45, unit:'秒', dur:45, metro:null },
     ]
   },
+  {
+    week: 4,
+    theme: '基礎代謝アップサーキット',
+    exercises: [
+      { name:'片足デッドリフト',         sub:'股関節から前傾・太もも裏を意識',     count:20, unit:'回', dur:60, metro:3   },
+      { name:'腕立てひねり',             sub:'腕立て→片手を天井へ・左右交互',     count:10, unit:'回', dur:40, metro:4   },
+      { name:'膝上げリバースランジ',     sub:'後ろランジ→戻りながら膝を胸へ',     count:20, unit:'回', dur:60, metro:3   },
+      { name:'スパイダーマンプランク',   sub:'プランクから膝を同側の肘へ引く',     count:20, unit:'回', dur:40, metro:2   },
+      { name:'腿上げ',                   sub:'膝を腰の高さまで・できる限り速く',   count:45, unit:'秒', dur:45, metro:null },
+    ]
+  },
 ];
 const REST_DUR = 30;
 const TOTAL_ROUNDS = 2;
@@ -556,9 +567,14 @@ function scheduleMetro() {
         numEl.textContent = metroRepCount;
         setRing(metroRepCount / ex.count, metroRepCount <= 3 ? 'endcount' : 'exercise');
 
-        // バードドッグの折り返し（残り10回＝半分）に交代音
+        // 折り返し（残り半分）に交代音：バードドッグ・片足デッドリフト・膝上げリバースランジ
         const isHalf = ex.count > 0 && metroRepCount === ex.count / 2;
-        if (ex.name && ex.name.includes('バードドッグ') && isHalf) {
+        const hasSwitchBeep = ex.name && (
+          ex.name.includes('バードドッグ') ||
+          ex.name.includes('片足デッドリフト') ||
+          ex.name.includes('膝上げリバースランジ')
+        );
+        if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
           numEl.classList.remove('pulse');
           void numEl.offsetWidth;
