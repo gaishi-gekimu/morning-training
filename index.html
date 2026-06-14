@@ -194,7 +194,7 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
   <div class="top-bar">
     <div>
       <div class="week-badge" id="weekBadge">WEEK 1</div>
-      <div class="round-display" style="margin-top:6px;">ROUND <span id="roundNum">1</span> / 2</div>
+      <div class="round-display" style="margin-top:6px;">ROUND <span id="roundNum">1</span> / <span id="totalRoundNum">2</span></div>
     </div>
   </div>
 
@@ -304,12 +304,29 @@ const ALL_WEEKS = [
       { name:'腿上げ',                   sub:'膝を腰の高さまで・できる限り速く',   count:45, unit:'秒', dur:45, metro:null },
     ]
   },
+  {
+    week: 5,
+    theme: '腹筋・腹斜筋強化サーキット',
+    rounds: 1,
+    exercises: [
+      { name:'クランチ',           sub:'あごを引いて腹筋で丸める・反動使わない',   count:20, unit:'回', dur:40,  metro:2   },
+      { name:'レッグレイズ',       sub:'足をまっすぐ・腰を床につけたまま',         count:15, unit:'回', dur:45,  metro:3   },
+      { name:'バイシクルクランチ', sub:'膝と反対の肘を交互に近づける',             count:40, unit:'秒', dur:40,  metro:null },
+      { name:'サイドプランク',     sub:'体を一直線に・腰を落とさない',             count:60, unit:'秒', dur:60,  metro:null },
+      { name:'Vアップ',           sub:'上体と足を同時に上げてVの字に',            count:15, unit:'回', dur:45,  metro:3   },
+    ]
+  },
 ];
 const REST_DUR = 30;
-const TOTAL_ROUNDS = 2;
 
 let currentWeekIdx = ALL_WEEKS.length - 1;
 let EXERCISES = ALL_WEEKS[currentWeekIdx].exercises;
+let TOTAL_ROUNDS = ALL_WEEKS[currentWeekIdx].rounds || 2;
+
+function updateTotalRoundDisplay() {
+  const el = document.getElementById('totalRoundNum');
+  if (el) el.textContent = TOTAL_ROUNDS;
+}
 
 let running = false, timer = null, countdownTimer = null;
 let timeLeft = 0, curRound = 1, curEx = 0, isRest = false, startTimestamp = null;
@@ -370,7 +387,9 @@ function toggleEntry(header) {
 function loadWeekAndClose(idx) {
   currentWeekIdx = idx;
   EXERCISES = ALL_WEEKS[idx].exercises;
+  TOTAL_ROUNDS = ALL_WEEKS[idx].rounds || 2;
   document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[idx].week}`;
+  updateTotalRoundDisplay();
   resetAll();
   toggleDrawer();
 }
@@ -572,7 +591,8 @@ function scheduleMetro() {
         const hasSwitchBeep = ex.name && (
           ex.name.includes('バードドッグ') ||
           ex.name.includes('片足デッドリフト') ||
-          ex.name.includes('膝上げリバースランジ')
+          ex.name.includes('膝上げリバースランジ') ||
+          ex.name.includes('サイドプランク')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
@@ -603,7 +623,10 @@ function scheduleMetro() {
                 document.getElementById(`check${i}`).textContent = '✓';
               });
               isRest = true; showRestUI(); startRest();
-            } else { showComplete(); }
+            } else {
+              document.getElementById('roundNum').textContent = TOTAL_ROUNDS;
+              showComplete();
+            }
           } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
         }, metroIntervalSec * 1000);
       }
@@ -657,6 +680,10 @@ function tick() {
     }
   } else {
     numEl.textContent = timeLeft;
+    // サイドプランク：半分のタイミングで交代音
+    if (!isRest && ex && ex.name && ex.name.includes('サイドプランク') && timeLeft === ex.dur / 2) {
+      playSwitchBeep();
+    }
     if (!isRest && timeLeft <= 3 && timeLeft >= 0) {
       setRing(timeLeft / total, 'endcount');
       playEndBeep(timeLeft);
@@ -692,7 +719,10 @@ function tick() {
             document.getElementById(`check${i}`).textContent = '✓';
           });
           isRest = true; showRestUI(); startRest();
-        } else { showComplete(); }
+        } else {
+          document.getElementById('roundNum').textContent = TOTAL_ROUNDS;
+          showComplete();
+        }
       } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
     }
   }
@@ -826,6 +856,7 @@ function resetAll() {
 // ── 初期化 ──
 // 最新週をバッジに反映
 document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[currentWeekIdx].week}`;
+updateTotalRoundDisplay();
 buildList();
 buildDrawer();
 </script>
