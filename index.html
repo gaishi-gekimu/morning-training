@@ -316,6 +316,16 @@ const ALL_WEEKS = [
       { name:'Vアップ',           sub:'上体と足を同時に上げてVの字に',            count:15, unit:'回', dur:45,  metro:3   },
     ]
   },
+  {
+    week: 6,
+    theme: '下半身特化サーキット',
+    exercises: [
+      { name:'ブルガリアンスクワット', sub:'後ろ足を椅子に乗せて片足スクワット',     count:20, unit:'回', dur:60, metro:3   },
+      { name:'スモウスクワット',       sub:'足を広めに開いてつま先を外側に向ける',   count:10, unit:'回', dur:30, metro:3   },
+      { name:'ドンキーキック',         sub:'四つん這いで片足を後ろ上に蹴り上げる',   count:20, unit:'回', dur:40, metro:2   },
+      { name:'カートシーランジ',       sub:'後ろ足をクロスさせて膝を床ギリギリに',   count:20, unit:'回', dur:60, metro:3   },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -592,7 +602,10 @@ function scheduleMetro() {
           ex.name.includes('バードドッグ') ||
           ex.name.includes('片足デッドリフト') ||
           ex.name.includes('膝上げリバースランジ') ||
-          ex.name.includes('サイドプランク')
+          ex.name.includes('サイドプランク') ||
+          ex.name.includes('ブルガリアンスクワット') ||
+          ex.name.includes('ドンキーキック') ||
+          ex.name.includes('カートシーランジ')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
