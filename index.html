@@ -326,6 +326,18 @@ const ALL_WEEKS = [
       { name:'カートシーランジ',       sub:'後ろ足をクロスさせて膝を床ギリギリに',   count:20, unit:'回', dur:60, metro:3   },
     ]
   },
+  {
+    week: 7,
+    theme: 'HILIT追い込みサーキット',
+    rounds: 1,
+    exercises: [
+      { name:'クラブタッチ',             sub:'お尻を上げてカニ姿勢・対角の手足をタッチ',   count:20, unit:'回', dur:40,  metro:2    },
+      { name:'プランクアップダウン',     sub:'肘と手を交互に切り替え・体は一直線',         count:20, unit:'回', dur:60,  metro:3    },
+      { name:'サイドプランクローテーション', sub:'サイドプランクから上の腕を床へひねる',   count:20, unit:'回', dur:60,  metro:3    },
+      { name:'ホローボディホールド',     sub:'仰向けでバナナ型・腰を床につけてキープ',     count:60, unit:'秒', dur:60,  metro:null },
+      { name:'スロースクワットパルス',   sub:'20秒 × 3セット・太もも平行で止まり上下', count:70, unit:'秒', dur:70,  metro:null, sets:3, setDur:20, setRest:5 },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -340,6 +352,7 @@ function updateTotalRoundDisplay() {
 
 let running = false, timer = null, countdownTimer = null;
 let timeLeft = 0, curRound = 1, curEx = 0, isRest = false, startTimestamp = null;
+let pulseSet = 0, isPulseRest = false;
 
 // ── ハンバーガードロワー ──
 function toggleDrawer() {
@@ -367,7 +380,7 @@ function buildDrawer() {
     const div = document.createElement('div');
     div.className = 'week-entry';
     const rows = w.exercises.map((ex,i) =>
-      `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.count}${ex.unit}</div></div>`
+      `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div></div>`
     ).join('');
     const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>`;
     div.innerHTML = `
@@ -414,7 +427,7 @@ function buildList() {
     const el = document.createElement('div');
     el.className = 'ex-item' + (i===0?' active':'');
     el.id = `exItem${i}`;
-    el.innerHTML = `<div class="ex-item-num">${i+1}</div><div class="ex-item-name">${ex.name}</div><div class="ex-item-detail">${ex.count}${ex.unit}</div><div class="checkmark" id="check${i}"></div>`;
+    el.innerHTML = `<div class="ex-item-num">${i+1}</div><div class="ex-item-name">${ex.name}</div><div class="ex-item-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div><div class="checkmark" id="check${i}"></div>`;
     list.appendChild(el);
     const dot = document.createElement('div');
     dot.className = 'circuit-dot' + (i===0?' active':'');
@@ -434,8 +447,19 @@ function updateCurrentEx() {
   document.getElementById('currentExNum').textContent   = `EXERCISE ${String(curEx+1).padStart(2,'0')} / 0${EXERCISES.length}`;
   document.getElementById('currentExName').textContent  = ex.name;
   document.getElementById('currentExSub').textContent   = ex.sub;
-  document.getElementById('currentExCount').textContent = ex.count;
-  document.getElementById('currentExUnit').textContent  = ex.unit;
+  if (ex.sets) {
+    document.getElementById('currentExCount').textContent = `${ex.setDur}秒×${ex.sets}回`;
+    document.getElementById('currentExCount').style.fontSize = '20px';
+    document.getElementById('currentExCount').style.fontFamily = "'Noto Sans JP', sans-serif";
+    document.getElementById('currentExCount').style.fontWeight = '900';
+    document.getElementById('currentExUnit').textContent  = '';
+  } else {
+    document.getElementById('currentExCount').textContent = ex.count;
+    document.getElementById('currentExCount').style.fontSize = '';
+    document.getElementById('currentExCount').style.fontFamily = '';
+    document.getElementById('currentExCount').style.fontWeight = '';
+    document.getElementById('currentExUnit').textContent  = ex.unit;
+  }
   EXERCISES.forEach((_,i) => {
     const item = document.getElementById(`exItem${i}`);
     const dot  = document.getElementById(`dot${i}`);
@@ -692,12 +716,35 @@ function tick() {
       // endcountはscheduleMetroで処理済みなのでここでは何もしない
     }
   } else {
-    numEl.textContent = timeLeft;
+    const isPulse = !isRest && ex && ex.sets && ex.name.includes('スロースクワットパルス');
+
+    if (isPulse) {
+      const totalDur = ex.setDur * ex.sets + ex.setRest * (ex.sets - 1); // 70秒
+      let totalRemaining;
+      if (isPulseRest) {
+        // 残りセット数 × setDur + 残り休憩 + 残りrestの数 × setRest
+        const setsRemaining = ex.sets - pulseSet; // まだやってないセット数
+        totalRemaining = timeLeft + setsRemaining * ex.setDur + Math.max(0, setsRemaining - 1) * ex.setRest;
+        numEl.textContent = timeLeft;
+        document.getElementById('timerLabel').textContent = `REST`;
+      } else {
+        // 現セットの残り + 残りセット分
+        const setsRemaining = ex.sets - pulseSet - 1;
+        totalRemaining = timeLeft + setsRemaining * (ex.setDur + ex.setRest);
+        numEl.textContent = timeLeft;
+        document.getElementById('timerLabel').textContent = `SET ${pulseSet + 1}/${ex.sets}`;
+      }
+      setRing(totalRemaining / totalDur, isPulseRest ? 'rest' : 'exercise');
+    } else {
+      numEl.textContent = timeLeft;
+    }
+
     // サイドプランク：半分のタイミングで交代音
     if (!isRest && ex && ex.name && ex.name.includes('サイドプランク') && timeLeft === ex.dur / 2) {
       playSwitchBeep();
     }
-    if (!isRest && timeLeft <= 3 && timeLeft >= 0) {
+    const isPulseActive = !isRest && ex && ex.sets && ex.name.includes('スロースクワットパルス');
+    if (!isPulseActive && !isRest && timeLeft <= 3 && timeLeft >= 0) {
       setRing(timeLeft / total, 'endcount');
       playEndBeep(timeLeft);
       numEl.classList.remove('pulse');
@@ -716,6 +763,53 @@ function tick() {
 
   if (timeLeft <= 0) {
     clearInterval(timer);
+
+    // スロースクワットパルスのセット管理
+    const ex = isRest ? null : EXERCISES[curEx];
+    if (!isRest && ex && ex.sets && ex.name.includes('スロースクワットパルス')) {
+      if (isPulseRest) {
+        // 休憩終了 → 次のセット開始
+        isPulseRest = false;
+        timeLeft = ex.setDur;
+        document.getElementById('timerNum').textContent   = timeLeft;
+        document.getElementById('timerLabel').textContent = `SET ${pulseSet + 1}/${ex.sets}`;
+        setRing(1, 'exercise');
+        timer = setInterval(tick, 1000);
+      } else {
+        // セット終了
+        playSwitchBeep();
+        pulseSet++;
+        if (pulseSet >= ex.sets) {
+          // 全セット完了 → 次の種目へ
+          curEx++;
+          if (curEx >= EXERCISES.length) {
+            if (curRound < TOTAL_ROUNDS) {
+              curRound++;
+              document.getElementById('roundNum').textContent = curRound;
+              EXERCISES.forEach((_,i) => {
+                document.getElementById(`exItem${i}`).classList.add('done');
+                document.getElementById(`dot${i}`).classList.add('done');
+                document.getElementById(`check${i}`).textContent = '✓';
+              });
+              isRest = true; showRestUI(); startRest();
+            } else {
+              document.getElementById('roundNum').textContent = TOTAL_ROUNDS;
+              showComplete();
+            }
+          } else { showNextInterval(() => { updateCurrentEx(); startEx(); }); }
+        } else {
+          // セット間休憩5秒
+          isPulseRest = true;
+          timeLeft = ex.setRest;
+          document.getElementById('timerNum').textContent   = timeLeft;
+          document.getElementById('timerLabel').textContent = `REST`;
+          setRing(1, 'rest');
+          timer = setInterval(tick, 1000);
+        }
+      }
+      return;
+    }
+
     if (isRest) {
       isRest = false; curEx = 0;
       updateCurrentEx(); showExUI();
@@ -752,8 +846,19 @@ function showNextInterval(cb) {
   setRing(1, 'rest');
   document.getElementById('currentExName').textContent  = nextEx.name;
   document.getElementById('currentExSub').textContent   = '準備してください';
-  document.getElementById('currentExCount').textContent = nextEx.count;
-  document.getElementById('currentExUnit').textContent  = nextEx.unit;
+  if (nextEx.sets) {
+    document.getElementById('currentExCount').textContent = `${nextEx.setDur}秒×${nextEx.sets}回`;
+    document.getElementById('currentExCount').style.fontSize = '20px';
+    document.getElementById('currentExCount').style.fontFamily = "'Noto Sans JP', sans-serif";
+    document.getElementById('currentExCount').style.fontWeight = '900';
+    document.getElementById('currentExUnit').textContent  = '';
+  } else {
+    document.getElementById('currentExCount').textContent = nextEx.count;
+    document.getElementById('currentExCount').style.fontSize = '';
+    document.getElementById('currentExCount').style.fontFamily = '';
+    document.getElementById('currentExCount').style.fontWeight = '';
+    document.getElementById('currentExUnit').textContent  = nextEx.unit;
+  }
   document.getElementById('currentExNum').textContent   = `NEXT: EXERCISE ${String(curEx+1).padStart(2,'0')} / 0${EXERCISES.length}`;
   playStartBeep(count);
 
@@ -773,6 +878,17 @@ function showNextInterval(cb) {
 
 function startEx() {
   const ex = EXERCISES[curEx];
+  if (ex.sets && ex.name.includes('スロースクワットパルス')) {
+    pulseSet = 0;
+    isPulseRest = false;
+    timeLeft = ex.setDur;
+    document.getElementById('timerNum').textContent   = timeLeft;
+    document.getElementById('timerLabel').textContent = `SET 1/${ex.sets}`;
+    setRing(1, 'exercise'); // 70秒全体で満タン
+    stopMetro();
+    timer = setInterval(tick, 1000);
+    return;
+  }
   timeLeft = ex.dur;
   if (ex.metro) {
     // 回数制：tickは使わずmetroだけで完結
@@ -839,7 +955,14 @@ function toggleStart() {
       runStartCountdown(() => { startTimestamp = Date.now(); startEx(); });
     } else {
       // ポーズ後再開：残り秒数からそのまま再開
-      timer = setInterval(tick, 1000);
+      const ex = EXERCISES[curEx];
+      if (!isRest && ex && ex.metro) {
+        // 回数制：metroを再起動
+        startMetro(ex.metro, timeLeft);
+      } else {
+        // 秒数制・パルス：tickを再起動
+        timer = setInterval(tick, 1000);
+      }
     }
   } else {
     running = false;
@@ -855,6 +978,7 @@ function resetAll() {
   stopMetro();
   releaseWakeLock();
   running = false; curRound = 1; curEx = 0; isRest = false; startTimestamp = null;
+  pulseSet = 0; isPulseRest = false;
   document.getElementById('roundNum').textContent   = '1';
   document.getElementById('timerNum').textContent   = '—';
   document.getElementById('timerLabel').textContent = 'READY';
