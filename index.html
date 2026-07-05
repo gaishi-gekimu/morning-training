@@ -338,6 +338,18 @@ const ALL_WEEKS = [
       { name:'スロースクワットパルス',   sub:'20秒 × 3セット・太もも平行で止まり上下', count:70, unit:'秒', dur:70,  metro:null, sets:3, setDur:20, setRest:5 },
     ]
   },
+  {
+    week: 8,
+    theme: '胸メイン・全身代謝アップサーキット',
+    rounds: 1,
+    exercises: [
+      { name:'デクラインプッシュアップ',         sub:'足を椅子に乗せて頭が下・大胸筋上部に効かせる',   count:15, unit:'回', dur:45, metro:3   },
+      { name:'チェアディップス',                 sub:'椅子に手をついて体を上下・肘を後ろに引く',       count:15, unit:'回', dur:45, metro:3   },
+      { name:'ヒンズープッシュアップ',           sub:'体で波を打つような動き・胸全体・肩・背中',       count:15, unit:'回', dur:60, metro:4   },
+      { name:'クロスボディマウンテンクライマー', sub:'対角の膝と肘を交互に引き合わせる',               count:20, unit:'回', dur:40, metro:2   },
+      { name:'スケータースクワット',             sub:'横に体重移動しながら片足スクワット・左右交互',   count:20, unit:'回', dur:60, metro:3   },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -629,7 +641,8 @@ function scheduleMetro() {
           ex.name.includes('サイドプランク') ||
           ex.name.includes('ブルガリアンスクワット') ||
           ex.name.includes('ドンキーキック') ||
-          ex.name.includes('カートシーランジ')
+          ex.name.includes('カートシーランジ') ||
+          ex.name.includes('スケータースクワット')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
