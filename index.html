@@ -350,6 +350,17 @@ const ALL_WEEKS = [
       { name:'スケータースクワット',             sub:'横に体重移動しながら片足スクワット・左右交互',   count:20, unit:'回', dur:60, metro:3   },
     ]
   },
+  {
+    week: 9,
+    theme: '全身シンプル追い込みサーキット',
+    rounds: 1,
+    exercises: [
+      { name:'インチワーム',                       sub:'立った状態から手を床について歩いてプランクまで', count:10, unit:'回', dur:80,  metro:8    },
+      { name:'スタンディングアブズ',               sub:'立ったまま肘と膝を対角で引き合わせる・左右交互', count:60, unit:'秒', dur:60,  metro:null },
+      { name:'ランジウォーク',                     sub:'大きく前に踏み出して歩きランジ・背筋まっすぐ',   count:60, unit:'秒', dur:60,  metro:null },
+      { name:'シングルレッグスクワットタッチダウン', sub:'片足スクワットで反対の手で床をタッチ・左右交互', count:20, unit:'回', dur:60,  metro:3    },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -383,6 +394,17 @@ document.addEventListener('touchmove', function(e) {
   }
 }, { passive: false });
 
+function calcWeekTime(w) {
+  const REST_DUR = 30;
+  const INTERVAL = 5;
+  const exCount = w.exercises.length;
+  const oneRound = w.exercises.reduce((s,e) => s + (e.sets ? e.setDur * e.sets + e.setRest * (e.sets-1) : e.dur), 0) + INTERVAL * (exCount - 1);
+  const total = oneRound * (w.rounds || 2) + ((w.rounds || 2) > 1 ? REST_DUR : 0);
+  const min = Math.floor(total / 60);
+  const sec = total % 60;
+  return sec > 0 ? `${min}分${sec}秒` : `${min}分`;
+}
+
 function buildDrawer() {
   const list = document.getElementById('weekList');
   list.innerHTML = '';
@@ -395,13 +417,17 @@ function buildDrawer() {
       `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div></div>`
     ).join('');
     const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>`;
+    const timeStr = calcWeekTime(w);
     div.innerHTML = `
       <div class="week-entry-header ${isCur?'current-week':''}" onclick="toggleEntry(this)">
         <div>
           <div class="week-entry-label ${isCur?'cur':''}">WEEK ${w.week}${isCur?' ● CURRENT':''}</div>
           <div class="week-entry-meta">${w.theme}</div>
         </div>
-        <div class="week-arrow">▼</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--muted);letter-spacing:1px;">${timeStr}</div>
+          <div class="week-arrow">▼</div>
+        </div>
       </div>
       <div class="week-body ${isCur?'open':''}">
         <div class="week-body-inner">
@@ -642,7 +668,8 @@ function scheduleMetro() {
           ex.name.includes('ブルガリアンスクワット') ||
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
-          ex.name.includes('スケータースクワット')
+          ex.name.includes('スケータースクワット') ||
+          ex.name.includes('シングルレッグスクワットタッチダウン')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
