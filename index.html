@@ -373,6 +373,17 @@ const ALL_WEEKS = [
       { name:'トゥタッチクランチ',   sub:'足を天井に上げて手でつま先をタッチ・腹筋上部',   count:15, unit:'回', dur:30, metro:2    },
     ]
   },
+  {
+    week: 11,
+    theme: '有酸素3分サーキット',
+    rounds: 1,
+    noInterval: true,
+    exercises: [
+      { name:'マウンテンクライマー',       sub:'プランク姿勢で足を交互に素早く引きつける',     count:60, unit:'秒', dur:60, metro:null },
+      { name:'ノンストップスクワット',     sub:'止まらずリズミカルに続ける・太もも平行まで',   count:60, unit:'秒', dur:60, metro:null },
+      { name:'バーピー（ジャンプなし）',   sub:'スクワット→胸を床に→立ち上がる・止まらない', count:60, unit:'秒', dur:60, metro:null },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -889,6 +900,8 @@ function tick() {
 
 // 種目間5秒インターバル
 function showNextInterval(cb) {
+  const week = ALL_WEEKS[currentWeekIdx];
+  if (week.noInterval) { cb(); return; }
   const numEl = document.getElementById('timerNum');
   const labelEl = document.getElementById('timerLabel');
   const nextEx = EXERCISES[curEx];
