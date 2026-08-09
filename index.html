@@ -389,10 +389,22 @@ const ALL_WEEKS = [
     theme: 'スクワット特化サーキット',
     rounds: 1,
     exercises: [
-      { name:'ピストルスクワット',       sub:'片足で深くスクワット・もう片足は前に伸ばす',     count:20, unit:'回', dur:80, metro:4   },
-      { name:'ブルガリアンスクワット',   sub:'後ろ足を椅子に乗せて片足スクワット・左右交互',   count:20, unit:'回', dur:60, metro:3   },
-      { name:'コサックスクワット',       sub:'足を広げて左右交互に体重移動しながらスクワット', count:20, unit:'回', dur:60, metro:3   },
+      { name:'ピストルスクワット',       sub:'片足で深くスクワット・もう片足は前に伸ばす',     count:20, unit:'回', dur:60, metro:3   },
+      { name:'ブルガリアンスクワット',   sub:'後ろ足を椅子に乗せて片足スクワット・左右交互',   count:20, unit:'回', dur:60, metro:2   },
+      { name:'コサックスクワット',       sub:'足を広げて左右交互に体重移動しながらスクワット', count:20, unit:'回', dur:40, metro:2   },
       { name:'パルススクワット',         sub:'スクワットの底で細かく上下・止まらない',         count:60, unit:'秒', dur:60, metro:null },
+    ]
+  },
+  {
+    week: 13,
+    theme: '浮き輪肉撃退サーキット',
+    rounds: 1,
+    exercises: [
+      { name:'ロシアンツイスト',           sub:'座った状態で上体を左右にひねる・腹斜筋',         count:20, unit:'回', dur:40,  metro:2    },
+      { name:'ウッドチョッパー',           sub:'ペットボトルを持って対角線上にひねる・左右交互', count:20, unit:'回', dur:60,  metro:3    },
+      { name:'オブリーククランチ',         sub:'横に傾けながらクランチ・脇腹の収縮・左右交互',   count:20, unit:'回', dur:40,  metro:2    },
+      { name:'ヒップサークル',             sub:'両足揃えて骨盤をくるくる回す・骨盤周り',         count:45, unit:'秒', dur:45,  metro:null },
+      { name:'スタンディングサイドクランチ', sub:'立ったまま肘と膝を脇腹で引き合わせる・左右交互', count:45, unit:'秒', dur:45,  metro:null },
     ]
   },
 ];
@@ -702,6 +714,8 @@ function scheduleMetro() {
           ex.name.includes('ブルガリアンスクワット') ||
           ex.name.includes('ピストルスクワット') ||
           ex.name.includes('コサックスクワット') ||
+          ex.name.includes('ウッドチョッパー') ||
+          ex.name.includes('オブリーククランチ') ||
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
           ex.name.includes('スケータースクワット') ||
