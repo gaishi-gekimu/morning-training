@@ -240,6 +240,9 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
     <button class="btn btn-start" id="startBtn" onclick="toggleStart()">START</button>
     <button class="btn btn-reset" onclick="resetAll()">↺</button>
   </div>
+  <div id="mainYoutubeLink" style="text-align:center;margin-top:6px;display:none;">
+    <a id="mainYoutubeLinkBtn" href="#" target="_blank" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);text-decoration:underline;">このメニューのやり方はこちら</a>
+  </div>
   <div class="silent-notice">🔔 音が鳴らない場合はサイレントモードを解除してください</div>
 </div>
 
@@ -253,6 +256,9 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
     <div class="stat"><div class="stat-num" id="totalTime">—</div><div class="stat-label">MINUTES</div></div>
   </div>
   <button class="btn-again" onclick="resetAll()">もう1周やる</button>
+  <div id="youtubeLink" style="margin-top:12px;display:none;">
+    <a id="youtubeLinkBtn" href="#" target="_blank" style="display:inline-block;padding:10px 28px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;border-radius:4px;text-decoration:none;">▶ YouTubeでフル動画を見る</a>
+  </div>
 </div>
 
 <script>
@@ -263,6 +269,7 @@ const ALL_WEEKS = [
   {
     week: 1,
     theme: '毎日同じメニューを7日間やり切る',
+    youtube: 'https://youtu.be/G_ZxMdKQEEk',
     exercises: [
       { name:'スロースクワット',     sub:'4秒で下ろす・お尻を意識', count:10, unit:'回', dur:40, metro:4   },
       { name:'ヒップリフト',         sub:'お尻をしっかり絞る',       count:15, unit:'回', dur:45, metro:3   },
@@ -273,6 +280,7 @@ const ALL_WEEKS = [
   },
   {
     week: 2,
+    youtube: 'https://youtu.be/4oyGIWLPr-c',
     theme: '全身の筋肉を総動員する週',
     exercises: [
       // metro: 秒/回（メトロノーム間隔）。nullなら時間制でメトロなし
@@ -285,6 +293,7 @@ const ALL_WEEKS = [
   },
   {
     week: 3,
+    youtube: 'https://youtu.be/Kp_iN4f5wgI',
     theme: 'ハイロックス風・全身サーキット',
     exercises: [
       { name:'バーピーブロード', sub:'スクワット→胸を床に→立ち上がる', count:10, unit:'回', dur:50, metro:5   },
@@ -295,6 +304,7 @@ const ALL_WEEKS = [
   },
   {
     week: 4,
+    youtube: 'https://youtu.be/a2opCDIjsqM',
     theme: '基礎代謝アップサーキット',
     exercises: [
       { name:'片足デッドリフト',         sub:'股関節から前傾・太もも裏を意識',     count:20, unit:'回', dur:60, metro:3   },
@@ -306,6 +316,7 @@ const ALL_WEEKS = [
   },
   {
     week: 5,
+    youtube: 'https://youtu.be/j8WOEmcb2oc',
     theme: '腹筋・腹斜筋強化サーキット',
     rounds: 1,
     exercises: [
@@ -318,6 +329,7 @@ const ALL_WEEKS = [
   },
   {
     week: 6,
+    youtube: 'https://youtu.be/TZHX9P-s3zE',
     theme: '下半身特化サーキット',
     exercises: [
       { name:'ブルガリアンスクワット', sub:'後ろ足を椅子に乗せて片足スクワット',     count:20, unit:'回', dur:60, metro:3   },
@@ -328,6 +340,7 @@ const ALL_WEEKS = [
   },
   {
     week: 7,
+    youtube: 'https://youtu.be/oOjQRUFG3vw',
     theme: 'HILIT追い込みサーキット',
     rounds: 1,
     exercises: [
@@ -340,6 +353,7 @@ const ALL_WEEKS = [
   },
   {
     week: 8,
+    youtube: 'https://youtu.be/hZx8QXsteD0',
     theme: '胸メイン・全身代謝アップサーキット',
     rounds: 1,
     exercises: [
@@ -352,6 +366,7 @@ const ALL_WEEKS = [
   },
   {
     week: 9,
+    youtube: 'https://youtu.be/QZc9tOnfeF0',
     theme: '全身シンプル追い込みサーキット',
     rounds: 1,
     exercises: [
@@ -363,6 +378,7 @@ const ALL_WEEKS = [
   },
   {
     week: 10,
+    youtube: 'https://youtu.be/p5EF3jwrdvc',
     theme: '腹筋集中サーキット',
     rounds: 1,
     exercises: [
@@ -375,6 +391,7 @@ const ALL_WEEKS = [
   },
   {
     week: 11,
+    youtube: 'https://youtu.be/5_XiWVF3knU',
     theme: '有酸素3分サーキット',
     rounds: 1,
     noInterval: true,
@@ -405,6 +422,17 @@ const ALL_WEEKS = [
       { name:'オブリーククランチ',         sub:'横に傾けながらクランチ・脇腹の収縮・左右交互',   count:20, unit:'回', dur:40,  metro:2    },
       { name:'ヒップサークル',             sub:'両足揃えて骨盤をくるくる回す・骨盤周り',         count:45, unit:'秒', dur:45,  metro:null },
       { name:'スタンディングサイドクランチ', sub:'立ったまま肘と膝を脇腹で引き合わせる・左右交互', count:45, unit:'秒', dur:45,  metro:null },
+    ]
+  },
+  {
+    week: 14,
+    theme: '消費カロリー高いプランク系サーキット',
+    rounds: 1,
+    exercises: [
+      { name:'プランクジャック',         sub:'プランクの姿勢で足を開閉・心拍数を上げる',       count:60, unit:'秒', dur:60, metro:null },
+      { name:'マウンテンクライマー',     sub:'プランク姿勢で足を交互に素早く引きつける',       count:60, unit:'秒', dur:60, metro:null },
+      { name:'ツイストプランク',         sub:'プランクの姿勢から腰を左右に回転させる',         count:60, unit:'秒', dur:60, metro:null },
+      { name:'スパイダーマンプランク',   sub:'プランクから膝を同側の肘へ引く・左右交互',       count:60, unit:'秒', dur:60, metro:null },
     ]
   },
 ];
@@ -462,7 +490,7 @@ function buildDrawer() {
     const rows = w.exercises.map((ex,i) =>
       `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div></div>`
     ).join('');
-    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>`;
+    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>${w.youtube ? `<a href="${w.youtube}" target="_blank" style="display:block;margin-top:8px;padding:8px 16px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;border-radius:4px;text-decoration:none;text-align:center;">▶ YouTubeでフル動画を見る</a>` : ''}`;
     const timeStr = calcWeekTime(w);
     div.innerHTML = `
       <div class="week-entry-header ${isCur?'current-week':''}" onclick="toggleEntry(this)">
@@ -491,12 +519,25 @@ function toggleEntry(header) {
   header.nextElementSibling.classList.toggle('open');
 }
 
+function updateMainYoutubeLink() {
+  const week = ALL_WEEKS[currentWeekIdx];
+  const div = document.getElementById('mainYoutubeLink');
+  const btn = document.getElementById('mainYoutubeLinkBtn');
+  if (week.youtube) {
+    btn.href = week.youtube;
+    div.style.display = 'block';
+  } else {
+    div.style.display = 'none';
+  }
+}
+
 function loadWeekAndClose(idx) {
   currentWeekIdx = idx;
   EXERCISES = ALL_WEEKS[idx].exercises;
   TOTAL_ROUNDS = ALL_WEEKS[idx].rounds || 2;
   document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[idx].week}`;
   updateTotalRoundDisplay();
+  updateMainYoutubeLink();
   resetAll();
   toggleDrawer();
 }
@@ -1030,6 +1071,16 @@ function showComplete() {
   document.getElementById('totalTime').textContent   = mins;
   document.getElementById('exDoneCount').textContent = EXERCISES.length;
   document.getElementById('completeOverlay').classList.add('visible');
+  // YouTubeリンク表示
+  const week = ALL_WEEKS[currentWeekIdx];
+  const ytDiv = document.getElementById('youtubeLink');
+  const ytBtn = document.getElementById('youtubeLinkBtn');
+  if (week.youtube) {
+    ytBtn.href = week.youtube;
+    ytDiv.style.display = 'block';
+  } else {
+    ytDiv.style.display = 'none';
+  }
   playFinale();
 }
 
@@ -1086,6 +1137,7 @@ function resetAll() {
 // 最新週をバッジに反映
 document.getElementById('weekBadge').textContent = `WEEK ${ALL_WEEKS[currentWeekIdx].week}`;
 updateTotalRoundDisplay();
+updateMainYoutubeLink();
 buildList();
 buildDrawer();
 </script>
