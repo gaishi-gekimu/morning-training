@@ -403,6 +403,7 @@ const ALL_WEEKS = [
   },
   {
     week: 12,
+    youtube: 'https://youtu.be/DfWs0e4OmXA',
     theme: 'スクワット特化サーキット',
     rounds: 1,
     exercises: [
@@ -414,6 +415,7 @@ const ALL_WEEKS = [
   },
   {
     week: 13,
+    youtube: 'https://youtu.be/NNruVr4wwjw',
     theme: '浮き輪肉撃退サーキット',
     rounds: 1,
     exercises: [
@@ -426,6 +428,7 @@ const ALL_WEEKS = [
   },
   {
     week: 14,
+    youtube: 'https://youtu.be/9fPmypF7MFc',
     theme: '消費カロリー高いプランク系サーキット',
     rounds: 1,
     exercises: [
@@ -440,12 +443,24 @@ const ALL_WEEKS = [
     theme: '腕立て特化・脂肪燃焼サーキット',
     rounds: 1,
     exercises: [
-      { name:'エクスプロッシブプッシュアップ', sub:'爆発的に押し上げる・手が浮くくらい素早く',     count:10, unit:'回', dur:20, metro:2   },
+      { name:'エクスプロッシブ\nプッシュアップ', sub:'爆発的に押し上げる・手が浮くくらい素早く',     count:10, unit:'回', dur:20, metro:2   },
       { name:'ワイドプッシュアップ',           sub:'手幅広めで大胸筋外側に効かせる',               count:10, unit:'回', dur:20, metro:2   },
-      { name:'パルスプッシュアップ',           sub:'底で細かく上下・限界まで止まらない',           count:10, unit:'回', dur:20, metro:2   },
       { name:'ダイヤモンドプッシュアップ',     sub:'手を菱形にして大胸筋内側・三頭筋に効かせる',   count:10, unit:'回', dur:20, metro:2   },
+      { name:'パルスプッシュアップ',           sub:'底で細かく上下・限界まで止まらない',           count:20, unit:'秒', dur:20, metro:null },
       { name:'デクラインプッシュアップ',       sub:'足を椅子に乗せて大胸筋上部・肩に効かせる',     count:10, unit:'回', dur:30, metro:3   },
       { name:'パイクプッシュアップ',           sub:'お尻を上げてV字の姿勢・肩・三角筋に効く',     count:10, unit:'回', dur:30, metro:3   },
+    ]
+  },
+  {
+    week: 16,
+    theme: '全身サーキット',
+    rounds: 1,
+    exercises: [
+      { name:'ヒンズープッシュアップ',       sub:'体で波を打つような動き・胸全体・肩・背中',     count:10, unit:'回', dur:40, metro:4   },
+      { name:'ブルガリアンスクワット',       sub:'後ろ足を椅子に乗せて片足スクワット・左右交互', count:20, unit:'回', dur:60, metro:3   },
+      { name:'マウンテンクライマー',         sub:'プランク姿勢で足を交互に素早く引きつける',     count:40, unit:'秒', dur:40, metro:null },
+      { name:'リバースクランチ',             sub:'仰向けで腰を持ち上げる・腹筋下部',             count:15, unit:'回', dur:45, metro:3   },
+      { name:'バーピー（ジャンプなし）',     sub:'スクワット→胸を床に→立ち上がる',               count:10, unit:'回', dur:50, metro:5   },
     ]
   },
 ];
@@ -574,7 +589,7 @@ function buildList() {
   });
   const ex0 = EXERCISES[0];
   document.getElementById('currentExNum').textContent   = `EXERCISE 01 / 0${EXERCISES.length}`;
-  document.getElementById('currentExName').textContent  = ex0.name;
+  document.getElementById('currentExName').innerHTML  = ex0.name.replace(/\n/g, '<br>');
   document.getElementById('currentExSub').textContent   = ex0.sub;
   document.getElementById('currentExCount').textContent = ex0.count;
   document.getElementById('currentExUnit').textContent  = ex0.unit;
@@ -583,7 +598,7 @@ function buildList() {
 function updateCurrentEx() {
   const ex = EXERCISES[curEx];
   document.getElementById('currentExNum').textContent   = `EXERCISE ${String(curEx+1).padStart(2,'0')} / 0${EXERCISES.length}`;
-  document.getElementById('currentExName').textContent  = ex.name;
+  document.getElementById('currentExName').innerHTML  = ex.name.replace(/\n/g, '<br>');
   document.getElementById('currentExSub').textContent   = ex.sub;
   if (ex.sets) {
     document.getElementById('currentExCount').textContent = `${ex.setDur}秒×${ex.sets}回`;
@@ -990,7 +1005,7 @@ function showNextInterval(cb) {
   numEl.textContent = count;
   labelEl.textContent = 'NEXT';
   setRing(1, 'rest');
-  document.getElementById('currentExName').textContent  = nextEx.name;
+  document.getElementById('currentExName').innerHTML  = nextEx.name.replace(/\n/g, '<br>');
   document.getElementById('currentExSub').textContent   = '準備してください';
   if (nextEx.sets) {
     document.getElementById('currentExCount').textContent = `${nextEx.setDur}秒×${nextEx.sets}回`;
