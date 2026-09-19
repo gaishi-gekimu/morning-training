@@ -497,6 +497,23 @@ const ALL_WEEKS = [
       { name:'デクラインプッシュアップ',     sub:'足を椅子に乗せて大胸筋上部・肩に効かせる',       count:10, unit:'回', dur:30, metro:3   },
     ]
   },
+  {
+    week: 19,
+    theme: '腹筋50・腕立て50チャレンジ vol.2',
+    rounds: 1,
+    exercises: [
+      { name:'Vアップ',                     sub:'上体と足を同時に上げてVの字に・腹筋全体',         count:10, unit:'回', dur:30, metro:3   },
+      { name:'ウィンドシールドワイパー',     sub:'仰向けで足を左右に倒す・腹斜筋下部',             count:10, unit:'回', dur:30, metro:3   },
+      { name:'ニートゥチェスト',             sub:'仰向けで膝を胸に引きつける・腸腰筋×腹筋',         count:10, unit:'回', dur:20, metro:2   },
+      { name:'トゥタッチクランチ',           sub:'足を天井に上げて手でつま先をタッチ・腹筋上部',   count:10, unit:'回', dur:20, metro:2   },
+      { name:'ヒールタッチ',                 sub:'仰向けで左右のかかとを交互にタッチ・腹斜筋',     count:10, unit:'回', dur:20, metro:2   },
+      { name:'ワイドプッシュアップ',         sub:'手幅広めで大胸筋外側に効かせる',                 count:10, unit:'回', dur:20, metro:2   },
+      { name:'ダイヤモンドプッシュアップ',   sub:'手を菱形にして大胸筋内側・三頭筋に効かせる',     count:10, unit:'回', dur:20, metro:2   },
+      { name:'パイクプッシュアップ',         sub:'お尻を上げてV字の姿勢・肩・三角筋に効く',       count:10, unit:'回', dur:20, metro:2   },
+      { name:'パルスプッシュアップ',         sub:'底で細かく上下・限界まで止まらない',             count:20, unit:'秒', dur:20, metro:null },
+      { name:'アーチャープッシュアップ',     sub:'片側に体重を乗せて片腕で押す・左右交互',         count:10, unit:'回', dur:20, metro:2   },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -819,6 +836,7 @@ function scheduleMetro() {
           ex.name.includes('コサックスクワット') ||
           ex.name.includes('ウッドチョッパー') ||
           ex.name.includes('オブリーククランチ') ||
+          ex.name.includes('アーチャープッシュアップ') ||
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
           ex.name.includes('スケータースクワット') ||
