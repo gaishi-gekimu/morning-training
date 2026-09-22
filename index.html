@@ -844,9 +844,20 @@ async function releaseWakeLock() {
   }
 }
 
-// タブ復帰時に再取得
+// タブ復帰時に再取得（スリープ防止＋音声）
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && running) requestWakeLock();
+  if (document.visibilityState === 'visible') {
+    if (running) requestWakeLock();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  }
+});
+
+// ロック画面から戻った直後の最初のタップ等で、念のため音声を復帰させる
+// （バックグラウンド復帰後、タイマー起点のresume()だけでは鳴らないブラウザ対策）
+['touchstart','pointerdown'].forEach(ev => {
+  document.addEventListener(ev, () => {
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  }, { passive:true });
 });
 
 function beep({ freq=880, dur=0.12, type='sine', gain=0.5, delay=0 }) {
@@ -1505,6 +1516,7 @@ function walkRenderTime(sec) {
 
 // 絶対時刻ベース（setIntervalのズレ・一時的な停止があっても遅れない）
 function walkTick() {
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   const now = Date.now();
   let moved = false;
   while (walkPhaseEnd <= now) {
@@ -1595,7 +1607,10 @@ function closeWalk(force) {
 
 // タブ復帰時にスリープ防止を再取得
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && walkRunning) requestWakeLock();
+  if (document.visibilityState === 'visible' && walkRunning) {
+    requestWakeLock();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  }
 });
 
 // ── 初期化 ──
