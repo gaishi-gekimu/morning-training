@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Circuit Training</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5D9H67PW3L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5D9H67PW3L');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -157,45 +165,6 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
 .stat-label { font-size:11px; color:var(--muted); letter-spacing:1px; }
 .btn-again { margin-top:16px; padding:14px 40px; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:4px; background:var(--accent); color:white; border:none; border-radius:4px; cursor:pointer; }
 @keyframes scaleIn { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
-
-/* ── ドロワー内：モード切替ボタン ── */
-.drawer-mode-btn { display:flex; align-items:center; gap:12px; padding:14px 20px; cursor:pointer; border-bottom:1px solid var(--border); background:rgba(255,215,0,.06); transition:background .2s; }
-.drawer-mode-btn:hover { background:rgba(255,215,0,.14); }
-.dm-icon { font-size:22px; line-height:1; }
-.dm-body { flex:1; }
-.dm-title { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:3px; color:var(--accent2); }
-.dm-sub { font-size:11px; color:var(--muted); margin-top:2px; }
-.dm-arrow { font-size:18px; color:var(--muted); }
-
-/* ── ジャパニーズウォーキング（筋トレとは別画面）── */
-.walk-screen { display:none; position:fixed; inset:0; z-index:120; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  background: radial-gradient(ellipse at 30% 60%,rgba(255,215,0,.08) 0%,transparent 55%), radial-gradient(ellipse at 75% 30%,rgba(255,60,47,.10) 0%,transparent 50%), linear-gradient(160deg,#111 0%,#0a0a0a 100%); }
-.walk-screen.visible { display:block; }
-.walk-wrap { width:100%; max-width:480px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; padding:24px 20px 32px; gap:14px; }
-.walk-top { display:flex; align-items:center; gap:10px; padding-right:110px; }
-.walk-back { width:36px; height:30px; background:var(--card); color:white; border:1px solid var(--border); border-radius:3px; font-size:16px; cursor:pointer; flex-shrink:0; }
-.walk-back:hover { border-color:white; }
-.walk-top .week-badge { white-space:nowrap; letter-spacing:2px; font-size:12px; }
-.walk-ring-wrap { position:relative; width:190px; height:190px; }
-.walk-ring-wrap svg { transform:rotate(-90deg); }
-.walk-num { font-size:54px; }
-.walk-next { text-align:center; font-size:12px; color:var(--muted); letter-spacing:1px; min-height:16px; }
-.walk-settings { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:6px 14px; }
-.walk-settings.hidden { display:none; }
-.walk-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06); }
-.walk-row:last-of-type { border-bottom:none; }
-.walk-row-label { font-size:13px; font-weight:700; }
-.walk-row-hint { font-size:10px; color:var(--muted); font-weight:400; margin-top:2px; }
-.walk-stepper { display:flex; align-items:center; gap:12px; }
-.walk-step-btn { width:34px; height:34px; border-radius:3px; border:1px solid var(--border); background:rgba(255,255,255,.06); color:white; font-size:18px; line-height:1; cursor:pointer; }
-.walk-step-btn:active { background:var(--accent); border-color:var(--accent); }
-.walk-step-val { font-family:'Bebas Neue',sans-serif; font-size:24px; min-width:44px; text-align:center; letter-spacing:1px; }
-.walk-step-val small { font-family:'Noto Sans JP',sans-serif; font-size:10px; color:var(--muted); margin-left:2px; }
-.walk-toggle { padding:6px 16px; border-radius:14px; border:1px solid var(--border); background:rgba(255,255,255,.06); color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:2px; cursor:pointer; }
-.walk-toggle.on { background:var(--accent2); color:#111; border-color:var(--accent2); }
-.walk-total { text-align:center; font-size:12px; color:var(--muted); padding:8px 0 6px; }
-.walk-total b { color:var(--accent2); font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:1px; font-weight:400; }
-.walk-guide { text-align:center; font-size:11px; color:rgba(255,255,255,.3); line-height:1.6; }
 </style>
 </head>
 <body>
@@ -224,14 +193,6 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
   <div class="drawer-header">
     <div class="drawer-title">TRAINING LOG</div>
     <div class="drawer-sub">週ごとのメニュー履歴</div>
-  </div>
-  <div class="drawer-mode-btn" onclick="openWalk()">
-    <div class="dm-icon">🚶</div>
-    <div class="dm-body">
-      <div class="dm-title">JAPANESE WALKING</div>
-      <div class="dm-sub">ジャパニーズウォーキング用タイマー</div>
-    </div>
-    <div class="dm-arrow">›</div>
   </div>
   <div id="weekList"></div>
 </div>
@@ -291,86 +252,6 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
     <a id="mainYoutubeLinkBtn" href="#" target="_blank" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);text-decoration:underline;">このメニューのやり方はこちら</a>
   </div>
   <div class="silent-notice">🔔 音が鳴らない場合はサイレントモードを解除してください</div>
-</div>
-
-<!-- ジャパニーズウォーキング（週メニューとは別画面） -->
-<div class="walk-screen" id="walkScreen">
-  <div class="walk-wrap">
-    <div class="walk-top">
-      <button class="walk-back" onclick="closeWalk()" aria-label="筋トレに戻る">←</button>
-      <div class="week-badge">JAPANESE WALKING</div>
-    </div>
-
-    <div class="timer-section">
-      <div class="walk-ring-wrap">
-        <svg width="190" height="190" viewBox="0 0 190 190">
-          <circle class="ring-bg" cx="95" cy="95" r="82" fill="none" stroke-width="8"/>
-          <circle id="walkRing" class="ring-fg" cx="95" cy="95" r="82" fill="none" stroke-width="8"
-            stroke-dasharray="515.22" stroke-dashoffset="0"/>
-        </svg>
-        <div class="timer-center">
-          <div class="timer-num walk-num" id="walkNum">--:--</div>
-          <div class="timer-label" id="walkLabel">READY</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="current-exercise" id="walkPhase">
-      <div class="ex-left">
-        <div class="ex-num" id="walkPhaseNum">READY</div>
-        <div class="ex-name" id="walkPhaseName">インターバル速歩</div>
-        <div class="ex-sub" id="walkPhaseSub">—</div>
-      </div>
-      <div>
-        <div class="ex-count" id="walkPhaseTotal">30:00</div>
-        <div class="ex-count-unit" id="walkPhaseTotalUnit">TOTAL</div>
-      </div>
-    </div>
-    <div class="walk-next" id="walkNext"></div>
-
-    <div class="circuit-progress">
-      <div class="circuit-label">SETS</div>
-      <div class="circuit-dots" id="walkDots"></div>
-    </div>
-
-    <div class="walk-settings" id="walkSettings">
-      <div class="walk-row">
-        <div class="walk-row-label">速歩<div class="walk-row-hint">やや息が弾む強さ</div></div>
-        <div class="walk-stepper">
-          <button class="walk-step-btn" onclick="walkAdj('fast',-1)">−</button>
-          <div class="walk-step-val"><span id="walkValFast">3</span><small>分</small></div>
-          <button class="walk-step-btn" onclick="walkAdj('fast',1)">＋</button>
-        </div>
-      </div>
-      <div class="walk-row">
-        <div class="walk-row-label">ゆっくり歩き<div class="walk-row-hint">呼吸を整える</div></div>
-        <div class="walk-stepper">
-          <button class="walk-step-btn" onclick="walkAdj('slow',-1)">−</button>
-          <div class="walk-step-val"><span id="walkValSlow">3</span><small>分</small></div>
-          <button class="walk-step-btn" onclick="walkAdj('slow',1)">＋</button>
-        </div>
-      </div>
-      <div class="walk-row">
-        <div class="walk-row-label">セット数<div class="walk-row-hint">速歩＋ゆっくりで1セット</div></div>
-        <div class="walk-stepper">
-          <button class="walk-step-btn" onclick="walkAdj('sets',-1)">−</button>
-          <div class="walk-step-val"><span id="walkValSets">5</span><small>set</small></div>
-          <button class="walk-step-btn" onclick="walkAdj('sets',1)">＋</button>
-        </div>
-      </div>
-      <div class="walk-row">
-        <div class="walk-row-label">ウォームアップ<div class="walk-row-hint">最初にゆっくり歩きを1回追加</div></div>
-        <button class="walk-toggle" id="walkWarmBtn" onclick="walkToggleWarm()">OFF</button>
-      </div>
-      <div class="walk-total">合計 <b id="walkTotalMin">30</b> 分</div>
-    </div>
-
-    <div class="controls">
-      <button class="btn btn-start" id="walkStartBtn" onclick="walkToggle()">START</button>
-      <button class="btn btn-reset" onclick="walkReset()">↺</button>
-    </div>
-    <div class="walk-guide">目安：3分速歩＋3分ゆっくり歩き × 5セット（30分）を週4日以上<br>🔔 音が鳴らない場合はサイレントモードを解除してください</div>
-  </div>
 </div>
 
 <!-- 完了画面 -->
@@ -629,10 +510,10 @@ const ALL_WEEKS = [
     theme: '腹筋50・腕立て50チャレンジ vol.2',
     rounds: 1,
     exercises: [
-      { name:'Vアップ',                     sub:'上体と足を同時に上げてVの字に・腹筋全体',         count:10, unit:'回', dur:15, metro:1.5  },
+      { name:'Vアップ',                     sub:'上体と足を同時に上げてVの字に・腹筋全体',         count:10, unit:'回', dur:15, metro:1.5 },
       { name:'ウィンドシールドワイパー',     sub:'仰向けで足を左右に倒す・腹斜筋下部',             count:10, unit:'回', dur:30, metro:3   },
-      { name:'ニートゥチェスト',             sub:'仰向けで膝を胸に引きつける・腸腰筋×腹筋',         count:10, unit:'回', dur:15, metro:1.5  },
-      { name:'トゥタッチクランチ',           sub:'足を天井に上げて手でつま先をタッチ・腹筋上部',   count:10, unit:'回', dur:15, metro:1.5  },
+      { name:'ニートゥチェスト',             sub:'仰向けで膝を胸に引きつける・腸腰筋×腹筋',         count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'トゥタッチクランチ',           sub:'足を天井に上げて手でつま先をタッチ・腹筋上部',   count:10, unit:'回', dur:15, metro:1.5 },
       { name:'ヒールタッチ',                 sub:'仰向けで左右のかかとを交互にタッチ・腹斜筋',     count:10, unit:'回', dur:20, metro:2   },
       { name:'ワイドプッシュアップ',         sub:'手幅広めで大胸筋外側に効かせる',                 count:10, unit:'回', dur:15, metro:1.5 },
       { name:'ダイヤモンドプッシュアップ',   sub:'手を菱形にして大胸筋内側・三頭筋に効かせる',     count:10, unit:'回', dur:15, metro:1.5 },
@@ -738,7 +619,6 @@ function updateMainYoutubeLink() {
 }
 
 function loadWeekAndClose(idx) {
-  if (typeof walkOpen !== 'undefined' && walkOpen) closeWalk(true);
   currentWeekIdx = idx;
   EXERCISES = ALL_WEEKS[idx].exercises;
   TOTAL_ROUNDS = ALL_WEEKS[idx].rounds || 2;
@@ -844,20 +724,9 @@ async function releaseWakeLock() {
   }
 }
 
-// タブ復帰時に再取得（スリープ防止＋音声）
+// タブ復帰時に再取得
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    if (running) requestWakeLock();
-    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  }
-});
-
-// ロック画面から戻った直後の最初のタップ等で、念のため音声を復帰させる
-// （バックグラウンド復帰後、タイマー起点のresume()だけでは鳴らないブラウザ対策）
-['touchstart','pointerdown'].forEach(ev => {
-  document.addEventListener(ev, () => {
-    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  }, { passive:true });
+  if (document.visibilityState === 'visible' && running) requestWakeLock();
 });
 
 function beep({ freq=880, dur=0.12, type='sine', gain=0.5, delay=0 }) {
@@ -1351,267 +1220,6 @@ function resetAll() {
   setRing(1, 'exercise');
   buildList();
 }
-
-// ════════════════════════════════
-// ジャパニーズウォーキング（インターバル速歩）
-// 週メニューとは独立。速歩とゆっくり歩きを交互に繰り返す
-// ════════════════════════════════
-const WALK_C = 515.22; // 2π × 82
-const WALK_KEY = 'jwalk_settings_v1';
-const WALK_LIMITS = { fast:[1,10], slow:[1,10], sets:[1,10] };
-let walkCfg = { fast:3, slow:3, sets:5, warmup:false };
-try {
-  const saved = JSON.parse(localStorage.getItem(WALK_KEY) || 'null');
-  if (saved) walkCfg = { ...walkCfg, ...saved };
-} catch(e) { /* 保存できない環境は既定値のまま */ }
-['fast','slow','sets'].forEach(k => {
-  const [lo,hi] = WALK_LIMITS[k];
-  walkCfg[k] = Math.min(hi, Math.max(lo, parseInt(walkCfg[k],10) || lo));
-});
-walkCfg.warmup = !!walkCfg.warmup;
-delete walkCfg.vibe; // 旧バージョンの保存値を掃除
-
-let walkOpen = false, walkRunning = false, walkStarted = false, walkFinished = false;
-let walkTimerId = null, walkPhases = [], walkIdx = 0, walkPhaseEnd = 0, walkRemainMs = 0, walkLastSec = -1;
-
-const wEl = id => document.getElementById(id);
-
-function fmtTime(sec) {
-  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
-  const ss = String(s).padStart(2,'0');
-  return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${ss}` : `${String(m).padStart(2,'0')}:${ss}`;
-}
-
-function buildWalkPhases() {
-  const p = [{ type:'ready', dur:3, set:0 }];
-  if (walkCfg.warmup) p.push({ type:'slow', dur:walkCfg.slow*60, set:0, warm:true });
-  for (let i = 1; i <= walkCfg.sets; i++) {
-    p.push({ type:'fast', dur:walkCfg.fast*60, set:i });
-    p.push({ type:'slow', dur:walkCfg.slow*60, set:i });
-  }
-  return p;
-}
-
-function walkTotalSec() {
-  return (walkCfg.warmup ? walkCfg.slow*60 : 0) + walkCfg.sets * (walkCfg.fast + walkCfg.slow) * 60;
-}
-
-function walkPhaseInfo(ph) {
-  if (ph.type === 'ready') return { name:'GET READY', sub:'準備してください' };
-  if (ph.type === 'fast')  return { name:'速歩', sub:'やや息が弾む強さで・大股でキビキビ歩く' };
-  if (ph.warm)             return { name:'ウォームアップ', sub:'ゆっくり歩いて体を温める' };
-  return { name:'ゆっくり歩き', sub:'呼吸を整えて・のんびり歩く' };
-}
-
-function setWalkRing(ratio, mode) {
-  const ring = wEl('walkRing');
-  ring.style.strokeDashoffset = WALK_C * (1 - Math.max(0, Math.min(1, ratio)));
-  ring.classList.remove('rest','endcount');
-  if (mode === 'rest') ring.classList.add('rest');
-  if (mode === 'endcount') ring.classList.add('endcount');
-}
-
-function buildWalkDots(activeSet, allDone) {
-  const dots = wEl('walkDots');
-  if (dots.children.length !== walkCfg.sets) {
-    dots.innerHTML = '';
-    for (let i = 1; i <= walkCfg.sets; i++) {
-      const d = document.createElement('div');
-      d.className = 'circuit-dot';
-      dots.appendChild(d);
-    }
-  }
-  [...dots.children].forEach((d, i) => {
-    const n = i + 1;
-    d.classList.remove('done','active');
-    if (allDone || n < activeSet) d.classList.add('done');
-    else if (n === activeSet) d.classList.add('active');
-  });
-}
-
-function renderWalkSettings() {
-  wEl('walkValFast').textContent = walkCfg.fast;
-  wEl('walkValSlow').textContent = walkCfg.slow;
-  wEl('walkValSets').textContent = walkCfg.sets;
-  const wb = wEl('walkWarmBtn');
-  wb.textContent = walkCfg.warmup ? 'ON' : 'OFF';
-  wb.classList.toggle('on', walkCfg.warmup);
-  wEl('walkTotalMin').textContent = walkTotalSec() / 60;
-  wEl('walkSettings').classList.toggle('hidden', walkStarted && !walkFinished);
-}
-
-// 待機中の表示
-function walkIdleView() {
-  wEl('walkNum').textContent = '--:--';
-  wEl('walkLabel').textContent = 'READY';
-  setWalkRing(1, 'exercise');
-  wEl('walkPhase').classList.remove('rest-mode');
-  wEl('walkPhaseNum').textContent = 'READY';
-  wEl('walkPhaseName').textContent = 'インターバル速歩';
-  wEl('walkPhaseSub').textContent = `${walkCfg.fast}分速歩 ＋ ${walkCfg.slow}分ゆっくり × ${walkCfg.sets}セット`;
-  wEl('walkPhaseTotal').textContent = fmtTime(walkTotalSec());
-  wEl('walkPhaseTotalUnit').textContent = 'TOTAL';
-  wEl('walkNext').textContent = walkCfg.warmup ? '最初にウォームアップ（ゆっくり歩き）から始まります' : '';
-  wEl('walkStartBtn').textContent = 'START';
-  buildWalkDots(0, false);
-}
-
-function walkAdj(key, delta) {
-  if (walkFinished) walkReset();
-  if (walkStarted) return;
-  const [lo,hi] = WALK_LIMITS[key];
-  walkCfg[key] = Math.min(hi, Math.max(lo, walkCfg[key] + delta));
-  walkSave(); renderWalkSettings(); walkIdleView();
-}
-function walkToggleWarm() {
-  if (walkFinished) walkReset();
-  if (walkStarted) return;
-  walkCfg.warmup = !walkCfg.warmup;
-  walkSave(); renderWalkSettings(); walkIdleView();
-}
-function walkSave() {
-  try { localStorage.setItem(WALK_KEY, JSON.stringify(walkCfg)); } catch(e) {}
-}
-
-// ── 効果音（速歩＝上昇音／ゆっくり＝下降音）──
-function playWalkFast() {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  [784, 988, 1175].forEach((f,i) => beep({ freq:f, dur:0.1, gain:0.9, delay:i*0.11 }));
-  beep({ freq:1568, dur:0.5, gain:1.0, delay:0.36 });
-}
-function playWalkSlow() {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  [1175, 988, 784].forEach((f,i) => beep({ freq:f, dur:0.1, gain:0.9, delay:i*0.11 }));
-  beep({ freq:587, dur:0.55, gain:1.0, delay:0.36, type:'triangle' });
-}
-
-function walkEnterPhase(ph, cue) {
-  const info = walkPhaseInfo(ph);
-  wEl('walkPhase').classList.toggle('rest-mode', ph.type === 'slow');
-  wEl('walkLabel').textContent = ph.type === 'ready' ? 'GET READY' : (ph.type === 'fast' ? 'FAST' : 'SLOW');
-  wEl('walkPhaseName').textContent = info.name;
-  wEl('walkPhaseSub').textContent  = info.sub;
-  wEl('walkPhaseNum').textContent  = ph.type === 'ready' ? 'READY' : (ph.warm ? 'WARM UP' : `SET ${ph.set} / ${walkCfg.sets}`);
-  wEl('walkPhaseTotalUnit').textContent = 'TOTAL LEFT';
-  const nx = walkPhases[walkIdx + 1];
-  if (nx) { const ni = walkPhaseInfo(nx); wEl('walkNext').textContent = `NEXT：${ni.name}  ${fmtTime(nx.dur)}`; }
-  else    { wEl('walkNext').textContent = 'NEXT：FINISH'; }
-  buildWalkDots(ph.set, false);
-  if (cue) { if (ph.type === 'fast') playWalkFast(); else if (ph.type === 'slow') playWalkSlow(); }
-}
-
-function walkRenderTime(sec) {
-  const ph = walkPhases[walkIdx];
-  wEl('walkNum').textContent = ph.type === 'ready' ? sec : fmtTime(sec);
-  const mode = (sec <= 3 && ph.type !== 'ready') ? 'endcount' : (ph.type === 'slow' ? 'rest' : 'exercise');
-  setWalkRing(sec / ph.dur, mode);
-  let left = ph.type === 'ready' ? 0 : sec;
-  for (let i = walkIdx + 1; i < walkPhases.length; i++) left += walkPhases[i].dur;
-  wEl('walkPhaseTotal').textContent = fmtTime(left);
-  if (sec <= 3) {
-    if (ph.type === 'ready') playStartBeep(sec); else playEndBeep(sec);
-    const n = wEl('walkNum'); n.classList.remove('pulse'); void n.offsetWidth; n.classList.add('pulse');
-  }
-}
-
-// 絶対時刻ベース（setIntervalのズレ・一時的な停止があっても遅れない）
-function walkTick() {
-  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  const now = Date.now();
-  let moved = false;
-  while (walkPhaseEnd <= now) {
-    const prevEnd = walkPhaseEnd;
-    walkIdx++;
-    if (walkIdx >= walkPhases.length) { walkFinish(); return; }
-    walkPhaseEnd = prevEnd + walkPhases[walkIdx].dur * 1000;
-    moved = true;
-  }
-  if (moved) { walkEnterPhase(walkPhases[walkIdx], true); walkLastSec = -1; }
-  const sec = Math.ceil((walkPhaseEnd - now) / 1000);
-  if (sec !== walkLastSec) { walkLastSec = sec; walkRenderTime(sec); }
-}
-
-function walkFinish() {
-  clearInterval(walkTimerId); walkTimerId = null;
-  walkRunning = false; walkFinished = true;
-  releaseWakeLock();
-  wEl('walkNum').textContent = 'DONE';
-  wEl('walkLabel').textContent = 'FINISH';
-  setWalkRing(1, 'rest');
-  wEl('walkPhase').classList.remove('rest-mode');
-  wEl('walkPhaseNum').textContent = 'COMPLETE';
-  wEl('walkPhaseName').textContent = 'お疲れさま！';
-  wEl('walkPhaseSub').textContent = `速歩 ${walkCfg.fast * walkCfg.sets}分 ／ ${walkCfg.sets}セット完了`;
-  wEl('walkPhaseTotal').textContent = walkTotalSec() / 60;
-  wEl('walkPhaseTotalUnit').textContent = 'MIN';
-  wEl('walkNext').textContent = '';
-  buildWalkDots(0, true);
-  wEl('walkStartBtn').textContent = 'AGAIN';
-  renderWalkSettings();
-  playFinale();
-}
-
-function walkToggle() {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  if (walkFinished) walkReset();
-  if (!walkRunning) {
-    if (!walkStarted) {
-      walkPhases = buildWalkPhases();
-      walkIdx = 0; walkStarted = true; walkFinished = false;
-      walkPhaseEnd = Date.now() + walkPhases[0].dur * 1000;
-      renderWalkSettings();
-      walkEnterPhase(walkPhases[0], false);
-    } else {
-      walkPhaseEnd = Date.now() + walkRemainMs;
-    }
-    walkRunning = true;
-    walkLastSec = -1;
-    wEl('walkStartBtn').textContent = 'PAUSE';
-    requestWakeLock();
-    clearInterval(walkTimerId);
-    walkTimerId = setInterval(walkTick, 200);
-    walkTick();
-  } else {
-    walkRemainMs = Math.max(0, walkPhaseEnd - Date.now());
-    walkRunning = false;
-    clearInterval(walkTimerId); walkTimerId = null;
-    releaseWakeLock();
-    wEl('walkStartBtn').textContent = 'RESUME';
-  }
-}
-
-function walkReset() {
-  clearInterval(walkTimerId); walkTimerId = null;
-  if (walkRunning || walkStarted) releaseWakeLock();
-  walkRunning = false; walkStarted = false; walkFinished = false;
-  walkIdx = 0; walkPhases = []; walkLastSec = -1; walkRemainMs = 0;
-  renderWalkSettings();
-  walkIdleView();
-}
-
-function openWalk() {
-  if (running) toggleStart();                 // 筋トレ中なら一時停止
-  if (document.getElementById('drawer').classList.contains('open')) toggleDrawer();
-  wEl('walkScreen').classList.add('visible');
-  walkOpen = true;
-  renderWalkSettings();
-  if (!walkStarted) walkIdleView();
-}
-
-function closeWalk(force) {
-  if (!force && walkStarted && !walkFinished && !confirm('ウォーキングを終了して戻りますか？')) return;
-  walkReset();
-  wEl('walkScreen').classList.remove('visible');
-  walkOpen = false;
-}
-
-// タブ復帰時にスリープ防止を再取得
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && walkRunning) {
-    requestWakeLock();
-    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  }
-});
 
 // ── 初期化 ──
 // 最新週をバッジに反映
