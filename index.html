@@ -636,6 +636,23 @@ const ALL_WEEKS = [
       { name:'アーチャープッシュアップ',     sub:'片側に体重を乗せて片腕で押す・左右交互',         count:10, unit:'回', dur:20, metro:2   },
     ]
   },
+  {
+    week: 20,
+    theme: '腹筋50・腕立て50チャレンジ vol.3',
+    rounds: 1,
+    exercises: [
+      { name:'Vアップ',                         sub:'上体と足を同時に上げてVの字に・腹筋全体',         count:10, unit:'回', dur:10, metro:1   },
+      { name:'レッグレイズ',                     sub:'足をまっすぐ・腰を床につけたまま上げる',           count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'バイシクルクランチ',               sub:'膝と反対の肘を交互に近づける・腹斜筋×腹筋',       count:10, unit:'回', dur:10, metro:1   },
+      { name:'ウィンドシールドワイパー',         sub:'仰向けで足を左右に倒す・腹斜筋下部',             count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'リバースクランチ',                 sub:'仰向けで腰を持ち上げる・腹筋下部',               count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'エクスプロッシブ\nプッシュアップ', sub:'爆発的に押し上げる・手が浮くくらい素早く',       count:10, unit:'回', dur:10, metro:1   },
+      { name:'タイプライタープッシュアップ',     sub:'胸を下げて横にスライド・大胸筋全体',             count:10, unit:'回', dur:20, metro:2   },
+      { name:'スパイダーマンプッシュアップ',     sub:'腕立てしながら膝を同側の肘に引く・左右交互',     count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'デクラインプッシュアップ',         sub:'足を椅子に乗せて大胸筋上部・肩に効かせる',       count:10, unit:'回', dur:15, metro:1.5 },
+      { name:'アーチャープッシュアップ',         sub:'片側に体重を乗せて片腕で押す・左右交互',         count:10, unit:'回', dur:15, metro:1.5 },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -959,6 +976,7 @@ function scheduleMetro() {
           ex.name.includes('ウッドチョッパー') ||
           ex.name.includes('オブリーククランチ') ||
           ex.name.includes('アーチャープッシュアップ') ||
+          ex.name.includes('スパイダーマンプッシュアップ') ||
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
           ex.name.includes('スケータースクワット') ||
@@ -1273,6 +1291,14 @@ function showComplete() {
   document.getElementById('totalTime').textContent   = mins;
   document.getElementById('exDoneCount').textContent = EXERCISES.length;
   document.getElementById('completeOverlay').classList.add('visible');
+  // GA4イベント送信
+  if (typeof gtag === 'function') {
+    gtag('event', 'workout_complete', {
+      'week': ALL_WEEKS[currentWeekIdx].week,
+      'theme': ALL_WEEKS[currentWeekIdx].theme,
+      'duration_min': mins,
+    });
+  }
   // YouTubeリンク表示
   const week = ALL_WEEKS[currentWeekIdx];
   const ytDiv = document.getElementById('youtubeLink');
