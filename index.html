@@ -675,9 +675,9 @@ const ALL_WEEKS = [
     theme: 'ハイロックス筋力ベース',
     rounds: 1,
     exercises: [
-      { name:'ブルガリアンスクワット',           sub:'後ろ足を椅子に乗せて沈む・大腿四頭筋・臀筋',       count:15, unit:'回', dur:45, metro:3,   altSide:true },
-      { name:'インチワームプッシュアップ',       sub:'前に歩いてプッシュアップ・体幹＋胸全体',           count:12, unit:'回', dur:36, metro:3   },
-      { name:'シングルレッグデッドリフト',       sub:'片足で前傾・ハムストリング＋体幹安定',             count:12, unit:'回', dur:36, metro:3,   altSide:true },
+      { name:'ブルガリアンスクワット',           sub:'後ろ足を椅子に乗せて沈む・大腿四頭筋・臀筋',       count:20, unit:'回', dur:60, metro:3,   halfway:true },
+      { name:'インチワームプッシュアップ',       sub:'前に歩いてプッシュアップ・体幹＋胸全体',           count:10, unit:'回', dur:40, metro:4   },
+      { name:'シングルレッグデッドリフト',       sub:'片足で前傾・ハムストリング＋体幹安定',             count:20, unit:'回', dur:60, metro:3,   halfway:true },
       { name:'マウンテンクライマー',               sub:'プランクの姿勢で膝を交互に引く・体幹＋有酸素',     count:60, unit:'秒', dur:60             },
     ]
   },
@@ -1008,7 +1008,8 @@ function scheduleMetro() {
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
           ex.name.includes('スケータースクワット') ||
-          ex.name.includes('シングルレッグスクワットタッチダウン')
+          ex.name.includes('シングルレッグスクワットタッチダウン') ||
+          ex.name.includes('シングルレッグデッドリフト')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
