@@ -684,7 +684,10 @@ const ALL_WEEKS = [
 ];
 const REST_DUR = 30;
 
-let currentWeekIdx = ALL_WEEKS.length - 1;
+// URLパラメータ ?week=XX でweek番号指定
+const _urlWeek = parseInt(new URLSearchParams(location.search).get('week'));
+const _urlWeekIdx = isNaN(_urlWeek) ? -1 : ALL_WEEKS.findIndex(w => w.week === _urlWeek);
+let currentWeekIdx = _urlWeekIdx >= 0 ? _urlWeekIdx : ALL_WEEKS.length - 1;
 let EXERCISES = ALL_WEEKS[currentWeekIdx].exercises;
 let TOTAL_ROUNDS = ALL_WEEKS[currentWeekIdx].rounds || 2;
 
@@ -736,7 +739,7 @@ function buildDrawer() {
     const rows = w.exercises.map((ex,i) =>
       `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div></div>`
     ).join('');
-    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>${w.youtube ? `<a href="${w.youtube}" target="_blank" style="display:block;margin-top:8px;padding:8px 16px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;border-radius:4px;text-decoration:none;text-align:center;">▶ YouTubeでフル動画を見る</a>` : ''}`;
+    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">このメニューで開始</button>${w.youtube ? `<a href="${w.youtube}" target="_blank" style="display:block;margin-top:8px;padding:8px 16px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;border-radius:4px;text-decoration:none;text-align:center;">▶ YouTubeでフル動画を見る</a>` : ''}`;
     const timeStr = calcWeekTime(w);
     div.innerHTML = `
       <div class="week-entry-header ${isCur?'current-week':''}" onclick="toggleEntry(this)">
@@ -774,6 +777,20 @@ function updateMainYoutubeLink() {
     div.style.display = 'block';
   } else {
     div.style.display = 'none';
+  }
+}
+
+function shareWeek(url) {
+  if (navigator.share) {
+    navigator.share({ title: 'Morning Training', url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const toast = document.createElement('div');
+      toast.textContent = 'URLをコピーしました';
+      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;pointer-events:none;';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    });
   }
 }
 
