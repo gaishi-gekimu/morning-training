@@ -693,6 +693,19 @@ const ALL_WEEKS = [
       { name:'ブルガリアンスクワット',           sub:'後ろ足を椅子に乗せて沈む・大腿四頭筋・臀筋',       count:20, unit:'回', dur:60, metro:3,   halfway:true },
     ]
   },
+  {
+    week: 25,
+    theme: '1日90秒！腹筋バキバキトレ',
+    rounds: 1,
+    intervalSec: 10,
+    exercises: [
+      { name:'クロスマウンテンクライマー', sub:'プランクで膝を反対の肘へ・腹斜筋＋体幹全体',       count:10, unit:'秒', dur:10 },
+      { name:'サソリキック',               sub:'プランクから片足を高く蹴り上げる・腹斜筋',         count:10, unit:'秒', dur:10 },
+      { name:'スーパーマンホールド',       sub:'うつ伏せで両腕前に伸ばして一直線キープ・腹横筋',   count:10, unit:'秒', dur:10 },
+      { name:'花火',                       sub:'仰向けで対角の手足をタッチ・腹直筋全体',           count:10, unit:'秒', dur:10 },
+      { name:'腹筋マウンテンクライマー',   sub:'プランクで足先を反対の手首にタッチ・腹筋全体',     count:10, unit:'秒', dur:10 },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -731,7 +744,7 @@ document.addEventListener('touchmove', function(e) {
 
 function calcWeekTime(w) {
   const REST_DUR = 30;
-  const INTERVAL = 5;
+  const INTERVAL = w.intervalSec || 5;
   const exCount = w.exercises.length;
   const oneRound = w.exercises.reduce((s,e) => s + (e.sets ? e.setDur * e.sets + e.setRest * (e.sets-1) : e.dur), 0) + INTERVAL * (exCount - 1);
   const total = oneRound * (w.rounds || 2) + ((w.rounds || 2) > 1 ? REST_DUR : 0);
@@ -1244,14 +1257,14 @@ function tick() {
   }
 }
 
-// 種目間5秒インターバル
+// 種目間インターバル（週ごとにintervalSecで指定可、デフォルト5秒）
 function showNextInterval(cb) {
   const week = ALL_WEEKS[currentWeekIdx];
   if (week.noInterval) { cb(); return; }
   const numEl = document.getElementById('timerNum');
   const labelEl = document.getElementById('timerLabel');
   const nextEx = EXERCISES[curEx];
-  let count = 5;
+  let count = week.intervalSec || 5;
   numEl.textContent = count;
   labelEl.textContent = 'NEXT';
   setRing(1, 'rest');
