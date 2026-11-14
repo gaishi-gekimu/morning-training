@@ -678,7 +678,7 @@ const ALL_WEEKS = [
       { name:'ブルガリアンスクワット',           sub:'後ろ足を椅子に乗せて沈む・大腿四頭筋・臀筋',       count:20, unit:'回', dur:60, metro:3,   halfway:true },
       { name:'インチワームプッシュアップ',       sub:'前に歩いてプッシュアップ・体幹＋胸全体',           count:10, unit:'回', dur:40, metro:4   },
       { name:'シングルレッグデッドリフト',       sub:'片足で前傾・ハムストリング＋体幹安定',             count:20, unit:'回', dur:60, metro:3,   halfway:true },
-      { name:'マウンテンクライマー',               sub:'プランクの姿勢で膝を交互に引く・体幹＋有酸素',     count:60, unit:'秒', dur:60             },
+      { name:'マウンテンクライマー',             sub:'プランクの姿勢で膝を交互に引く・体幹＋有酸素',     count:60, unit:'秒', dur:60             },
     ]
   },
   {
@@ -704,6 +704,19 @@ const ALL_WEEKS = [
       { name:'スーパーマンホールド',       sub:'うつ伏せで両腕前に伸ばして一直線キープ・腹横筋',   count:10, unit:'秒', dur:10 },
       { name:'花火',                       sub:'仰向けで対角の手足をタッチ・腹直筋全体',           count:10, unit:'秒', dur:10 },
       { name:'腹筋マウンテンクライマー',   sub:'プランクで足先を反対の手首にタッチ・腹筋全体',     count:10, unit:'秒', dur:10 },
+    ]
+  },
+  {
+    week: 26,
+    theme: '1日90秒！腹筋バキバキトレ 進化版',
+    rounds: 1,
+    intervalSec: 5,
+    exercises: [
+      { name:'スパイダーマンマウンテンクライマー', sub:'プランクで膝を肘の外側まで持っていく・腹斜筋＋体幹', count:15, unit:'秒', dur:15 },
+      { name:'サソリキック＋手首タッチ',           sub:'蹴り上げた足を反対の手でタッチ・腹斜筋強化',         count:15, unit:'秒', dur:15 },
+      { name:'スーパーマン＋対角レイズ',           sub:'腕立て1回→対角の手足を上げる・体幹＋背面全体',     count:15, unit:'秒', dur:15 },
+      { name:'Vアップ',                           sub:'上体と両足を同時に上げてV字・腹筋全体',               count:15, unit:'秒', dur:15 },
+      { name:'マウンテンクライマー＋プランクホップ', sub:'手首タッチ→両足を前に引きつける・腹筋＋体幹',       count:15, unit:'秒', dur:15 },
     ]
   },
 ];
@@ -764,7 +777,7 @@ function buildDrawer() {
     const rows = w.exercises.map((ex,i) =>
       `<div class="wex-row"><div class="wex-n">${i+1}</div><div class="wex-name">${ex.name}</div><div class="wex-detail">${ex.sets ? `${ex.setDur}秒×${ex.sets}回` : ex.count+ex.unit}</div></div>`
     ).join('');
-    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">このメニューで開始</button>${w.youtube ? `<a href="${w.youtube}" target="_blank" style="display:block;margin-top:8px;padding:8px 16px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;border-radius:4px;text-decoration:none;text-align:center;">▶ YouTubeでフル動画を見る</a>` : ''}`;
+    const actionHtml = `<button class="drawer-start-btn" onclick="loadWeekAndClose(${origIdx})">${isCur ? 'このメニューで開始' : 'このメニューで開始'}</button>${w.youtube ? `<a href="${w.youtube}" target="_blank" style="display:block;margin-top:8px;padding:8px 16px;background:#FF0000;color:white;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;border-radius:4px;text-decoration:none;text-align:center;">▶ YouTubeでフル動画を見る</a>` : ''}`;
     const timeStr = calcWeekTime(w);
     div.innerHTML = `
       <div class="week-entry-header ${isCur?'current-week':''}" onclick="toggleEntry(this)">
@@ -802,20 +815,6 @@ function updateMainYoutubeLink() {
     div.style.display = 'block';
   } else {
     div.style.display = 'none';
-  }
-}
-
-function shareWeek(url) {
-  if (navigator.share) {
-    navigator.share({ title: 'Morning Training', url });
-  } else {
-    navigator.clipboard.writeText(url).then(() => {
-      const toast = document.createElement('div');
-      toast.textContent = 'URLをコピーしました';
-      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;pointer-events:none;';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
-    });
   }
 }
 
@@ -1050,8 +1049,7 @@ function scheduleMetro() {
           ex.name.includes('ドンキーキック') ||
           ex.name.includes('カートシーランジ') ||
           ex.name.includes('スケータースクワット') ||
-          ex.name.includes('シングルレッグスクワットタッチダウン') ||
-          ex.name.includes('シングルレッグデッドリフト')
+          ex.name.includes('シングルレッグスクワットタッチダウン')
         );
         if (hasSwitchBeep && isHalf) {
           playSwitchBeep();
@@ -1257,7 +1255,7 @@ function tick() {
   }
 }
 
-// 種目間インターバル（週ごとにintervalSecで指定可、デフォルト5秒）
+// 種目間5秒インターバル
 function showNextInterval(cb) {
   const week = ALL_WEEKS[currentWeekIdx];
   if (week.noInterval) { cb(); return; }
