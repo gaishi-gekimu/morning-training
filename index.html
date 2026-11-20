@@ -316,7 +316,7 @@ body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--
   <div class="top-bar">
     <div>
       <div class="week-badge" id="weekBadge">WEEK 1</div>
-      <div class="round-display" style="margin-top:6px;">ROUND <span id="roundNum">1</span> / <span id="totalRoundNum">2</span></div>
+      <div class="round-display" id="roundDisplay" style="margin-top:6px;display:none;">ROUND <span id="roundNum">1</span> / <span id="totalRoundNum">2</span></div>
     </div>
   </div>
 
@@ -719,6 +719,16 @@ const ALL_WEEKS = [
       { name:'マウンテンクライマー＋プランクホップ', sub:'手首タッチ→両足を前に引きつける・腹筋＋体幹',       count:15, unit:'秒', dur:15 },
     ]
   },
+  {
+    week: 27,
+    theme: 'カオスプッシュアップ',
+    rounds: 5,
+    intervalSec: 5,
+    noRest: true,
+    exercises: [
+      { name:'カオスプッシュアップ', sub:'1回ごとに肩・膝・足首タッチを混ぜて10回・胸筋＋体幹', count:10, unit:'回', metro:1.5, firstMetro:2.5, dur:16 },
+    ]
+  },
 ];
 const REST_DUR = 30;
 
@@ -732,6 +742,8 @@ let TOTAL_ROUNDS = ALL_WEEKS[currentWeekIdx].rounds || 2;
 function updateTotalRoundDisplay() {
   const el = document.getElementById('totalRoundNum');
   if (el) el.textContent = TOTAL_ROUNDS;
+  const rd = document.getElementById('roundDisplay');
+  if (rd) rd.style.display = TOTAL_ROUNDS > 1 ? 'block' : 'none';
 }
 
 let running = false, timer = null, countdownTimer = null;
@@ -1012,9 +1024,11 @@ function playWhistleAt(when) {
 }
 
 let metroIntervalSec = 0;
+let metroFirstIntervalSec = 0; // 1回目→2回目の間隔（Week27カオスプッシュアップ用）
 let metroNextTime = 0;
 let metroRAF = null;
 let metroRepCount = 0; // 残り回数カウント
+let metroIsFirst = false; // 最初のインターバルかどうか
 
 function scheduleMetro() {
   while (metroNextTime < audioCtx.currentTime + 0.15) {
@@ -1079,7 +1093,18 @@ function scheduleMetro() {
                 document.getElementById(`dot${i}`).classList.add('done');
                 document.getElementById(`check${i}`).textContent = '✓';
               });
-              isRest = true; showRestUI(); startRest();
+              const week = ALL_WEEKS[currentWeekIdx];
+              if (week.noRest) {
+                curEx = 0;
+                EXERCISES.forEach((_,i) => {
+                  document.getElementById(`exItem${i}`).classList.remove('done');
+                  document.getElementById(`dot${i}`).classList.remove('done');
+                  document.getElementById(`check${i}`).textContent = '';
+                });
+                showNextInterval(() => { updateCurrentEx(); startEx(); });
+              } else {
+                isRest = true; showRestUI(); startRest();
+              }
             } else {
               document.getElementById('roundNum').textContent = TOTAL_ROUNDS;
               showComplete();
@@ -1093,12 +1118,15 @@ function scheduleMetro() {
   metroRAF = requestAnimationFrame(scheduleMetro);
 }
 
-function startMetro(intervalSec, repCount) {
+function startMetro(intervalSec, repCount, firstIntervalSec) {
   stopMetro();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   metroIntervalSec = intervalSec;
-  // 少し間を置いてから1発目（GO後に動き始めるタイミングに合わせる）
-  metroNextTime = audioCtx.currentTime + 0.3;
+  metroFirstIntervalSec = 0;
+  metroIsFirst = false;
+  // firstIntervalSec指定時はスタート→1発目の間隔を長めにする
+  const startDelay = firstIntervalSec ? firstIntervalSec : 0.3;
+  metroNextTime = audioCtx.currentTime + startDelay;
   metroRepCount = repCount;
   scheduleMetro();
 }
@@ -1317,7 +1345,7 @@ function startEx() {
     document.getElementById('timerNum').textContent   = ex.count;
     document.getElementById('timerLabel').textContent = 'REPS';
     setRing(1, 'exercise');
-    startMetro(ex.metro, ex.count);
+    startMetro(ex.metro, ex.count, ex.firstMetro);
     // tickは起動しない
   } else {
     document.getElementById('timerNum').textContent   = timeLeft;
